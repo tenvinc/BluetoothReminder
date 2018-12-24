@@ -1,53 +1,68 @@
 package com.project.tenvinc.bluetoothreminder;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.os.RemoteException;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ListView;
 
 import org.altbeacon.beacon.Beacon;
-import org.altbeacon.beacon.BeaconConsumer;
-import org.altbeacon.beacon.BeaconManager;
-import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.RangeNotifier;
-import org.altbeacon.beacon.Region;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements BeaconConsumer {
+public class MainActivity extends AppCompatActivity {
 
-    BeaconManager beaconManager = null;
-    static final String IBEACON_LAYOUT = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24";
+    public static List<Beacon> BEACONS = new ArrayList<>();
     static final String TAG = "RangingActivity";
     static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
+    BeaconListAdapter mAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+        ListView list = findViewById(R.id.list);
+        mAdapter = new BeaconListAdapter(this, BeaconApplication.getInstance().beacons);
+        list.setAdapter(mAdapter);
+
+        Button refreshBtn = findViewById(R.id.refreshBtn);
+        refreshBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAdapter.setData(BeaconApplication.getInstance().beacons);
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+
+        validatePermissions(this);
+    }
+
+    public void validatePermissions(final Activity activity) {
+        if (activity.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(activity);
             builder.setTitle("This app requires location access");
             builder.setMessage("Please grant location access so this app can detect beacons.");
             builder.setPositiveButton(android.R.string.ok, null);
             builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
-                    requestPermissions(new String[] {Manifest.permission.ACCESS_COARSE_LOCATION},
+                    activity.requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                             PERMISSION_REQUEST_COARSE_LOCATION);
                 }
             });
             builder.show();
         }
-
-        initBeaconManager();
     }
 
     @Override
@@ -69,40 +84,10 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
                         }
                     });
                     builder.show();
-                    initBeaconManager();
                 }
                 return;
             default:
                 Log.e(TAG, "Something has gone wrong");
         }
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        beaconManager.unbind(this);
-    }
-
-    @Override
-    public void onBeaconServiceConnect() {
-        beaconManager.addRangeNotifier(new RangeNotifier() {
-            @Override
-            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-                for (Beacon beacon : beacons) {
-                    Log.d(TAG, "distance: " + beacon.getDistance() + " id:" + beacon.getId1() + "/" + beacon.getId2() + "/" + beacon.getId3());
-                }
-            }
-        });
-
-        try {
-            beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
-        } catch (RemoteException e) {    }
-    }
-
-    private void initBeaconManager() {
-        beaconManager = BeaconManager.getInstanceForApplication(this);
-        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(IBEACON_LAYOUT));
-        beaconManager.bind(this);
-    }
-
 }

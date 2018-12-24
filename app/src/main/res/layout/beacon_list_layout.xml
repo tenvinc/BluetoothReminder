@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/uuidText"
+        android:layout_width="281dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="18dp"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/majorText"
+        android:layout_width="281dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="@+id/uuidText"
+        app:layout_constraintStart_toStartOf="@+id/uuidText"
+        app:layout_constraintTop_toBottomOf="@+id/uuidText" />
+
+    <TextView
+        android:id="@+id/minorText"
+        android:layout_width="281dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="@+id/majorText"
+        app:layout_constraintStart_toStartOf="@+id/majorText"
+        app:layout_constraintTop_toBottomOf="@+id/majorText" />
+</android.support.constraint.ConstraintLayout>

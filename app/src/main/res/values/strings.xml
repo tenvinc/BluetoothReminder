@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">BluetoothReminder</string>
+    <string name="refresh_beacons">Refresh beacons</string>
 </resources>
