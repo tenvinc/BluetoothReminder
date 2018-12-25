@@ -2,6 +2,7 @@ package com.project.tenvinc.bluetoothreminder;
 
 import android.app.Application;
 import android.os.RemoteException;
+import android.util.Log;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
@@ -16,11 +17,11 @@ import java.util.List;
 
 public class BeaconApplication extends Application implements BeaconConsumer {
 
-    public static final String IBEACON_LAYOUT = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24";
+    private static final String IBEACON_LAYOUT = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24";
     private static final String TAG = "BeaconApplication";
-    private static BeaconApplication instance = new BeaconApplication();
+    private static final BeaconApplication instance = new BeaconApplication();
     public List<Beacon> beacons = new ArrayList<>();
-    public List<TrackedAdapter.TrackRecord> trackedBeacons = new ArrayList<>();
+    public final List<TrackedAdapter.TrackRecord> trackedBeacons = new ArrayList<>();
     private BeaconManager beaconManager;
 
     public static BeaconApplication getInstance() {
@@ -45,7 +46,7 @@ public class BeaconApplication extends Application implements BeaconConsumer {
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
                 List<Beacon> beaconList = new ArrayList<>();
                 for (Beacon b : beacons) {
-                    if (!isTracked(b)) {
+                    if (isNotTracked(b)) {
                         beaconList.add(b);
                     }
                 }
@@ -56,7 +57,7 @@ public class BeaconApplication extends Application implements BeaconConsumer {
         try {
             beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
         } catch (RemoteException e) {
-
+            Log.e(TAG, "Unable to range beacons in region" + e.getStackTrace());
         }
     }
 
@@ -67,13 +68,13 @@ public class BeaconApplication extends Application implements BeaconConsumer {
     }
 
 
-    private boolean isTracked(Beacon toTest) {
-        Boolean isTracked = false;
+    private boolean isNotTracked(Beacon toTest) {
+        Boolean isTracked = true;
         for (TrackedAdapter.TrackRecord r : getInstance().trackedBeacons) {
             if (toTest.getId1().toString().equals(r.getUuid()) &&
                     toTest.getId2().toString().equals(r.getMinor()) &&
                     toTest.getId3().toString().equals(r.getMajor())) {
-                isTracked = true;
+                isTracked = false;
                 break;
             }
         }

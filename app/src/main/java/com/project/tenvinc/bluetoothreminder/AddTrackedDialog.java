@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ public class AddTrackedDialog extends AppCompatDialogFragment {
     private TextView majorText;
     private FavouritesDialogListener listener;
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

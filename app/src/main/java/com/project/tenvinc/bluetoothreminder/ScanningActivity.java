@@ -21,10 +21,10 @@ import java.util.List;
 
 public class ScanningActivity extends AppCompatActivity implements AddTrackedDialog.FavouritesDialogListener {
 
-    static final String TAG = "RangingActivity";
-    static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
+    private static final String TAG = "RangingActivity";
+    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     public static List<Beacon> BEACONS = new ArrayList<>();
-    BeaconListAdapter mAdapter;
+    private BeaconListAdapter mAdapter;
 
 
     @Override
@@ -65,7 +65,7 @@ public class ScanningActivity extends AppCompatActivity implements AddTrackedDia
         validatePermissions(this);
     }
 
-    public void validatePermissions(final Activity activity) {
+    private void validatePermissions(final Activity activity) {
         if (activity.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(activity);

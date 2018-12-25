@@ -10,10 +10,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrackedAdapter extends BaseAdapter {
+class TrackedAdapter extends BaseAdapter {
 
     private List<TrackRecord> trackedBeacons;
-    private LayoutInflater inflater;
+    private final LayoutInflater inflater;
 
     public TrackedAdapter(Context context) {
         trackedBeacons = new ArrayList<>();
@@ -64,10 +64,10 @@ public class TrackedAdapter extends BaseAdapter {
 
     public static class TrackRecord {
 
-        String uuid;
-        String major;
-        String minor;
-        String beaconName;
+        private final String uuid;
+        private final String major;
+        private final String minor;
+        private final String beaconName;
 
         public TrackRecord(String uuid, String major, String minor, String beaconName) {
             this.uuid = uuid;

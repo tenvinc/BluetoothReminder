@@ -12,8 +12,8 @@ import org.altbeacon.beacon.Beacon;
 import java.util.List;
 
 public class BeaconListAdapter extends BaseAdapter {
-    LayoutInflater inflater;
-    List<Beacon> data;
+    private final LayoutInflater inflater;
+    private List<Beacon> data;
 
     public BeaconListAdapter(Context context, List<Beacon> data) {
         inflater = LayoutInflater.from(context);
