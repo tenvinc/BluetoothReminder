@@ -20,6 +20,7 @@ public class BeaconApplication extends Application implements BeaconConsumer {
     private static final String TAG = "BeaconApplication";
     private static BeaconApplication instance = new BeaconApplication();
     public List<Beacon> beacons = new ArrayList<>();
+    public List<TrackedAdapter.TrackRecord> trackedBeacons = new ArrayList<>();
     private BeaconManager beaconManager;
 
     public static BeaconApplication getInstance() {
@@ -42,7 +43,13 @@ public class BeaconApplication extends Application implements BeaconConsumer {
         beaconManager.addRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-                BeaconApplication.getInstance().beacons = new ArrayList<>(beacons);
+                List<Beacon> beaconList = new ArrayList<>();
+                for (Beacon b : beacons) {
+                    if (!isTracked(b)) {
+                        beaconList.add(b);
+                    }
+                }
+                getInstance().beacons = beaconList;
             }
         });
 
@@ -57,5 +64,19 @@ public class BeaconApplication extends Application implements BeaconConsumer {
     public void onTerminate() {
         super.onTerminate();
         beaconManager.unbind(this);
+    }
+
+
+    private boolean isTracked(Beacon toTest) {
+        Boolean isTracked = false;
+        for (TrackedAdapter.TrackRecord r : getInstance().trackedBeacons) {
+            if (toTest.getId1().toString().equals(r.getUuid()) &&
+                    toTest.getId2().toString().equals(r.getMinor()) &&
+                    toTest.getId3().toString().equals(r.getMajor())) {
+                isTracked = true;
+                break;
+            }
+        }
+        return isTracked;
     }
 }

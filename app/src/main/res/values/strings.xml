@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">BluetoothReminder</string>
     <string name="refresh_beacons">Refresh beacons</string>
+    <string name="title_activity_scanning">ScanningActivity</string>
+    <string name="title_activity_tracked">ListTrackedActivity</string>
+    <string name="main_menu">Main Menu</string>
+    <string name="tracked_beacons">Tracked Beacons</string>
 </resources>
