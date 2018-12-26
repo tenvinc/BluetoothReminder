@@ -35,7 +35,7 @@ public class ListTrackedActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        trackedAdapter.setData(BeaconApplication.getInstance().trackedBeacons);
+        trackedAdapter.setData(BeaconApplication.getInstance().trackedBeaconRecord);
         trackedAdapter.notifyDataSetChanged();
     }
 }

@@ -4,6 +4,8 @@ import android.app.Application;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.project.tenvinc.bluetoothreminder.interfaces.IRefresh;
+
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
@@ -19,10 +21,11 @@ public class BeaconApplication extends Application implements BeaconConsumer {
 
     private static final String IBEACON_LAYOUT = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24";
     private static final String TAG = "BeaconApplication";
-    private static final BeaconApplication instance = new BeaconApplication();
+    private static final Region myRegion = new Region("myRegion", null, null, null);
     public List<Beacon> beacons = new ArrayList<>();
-    public final List<TrackedAdapter.TrackRecord> trackedBeacons = new ArrayList<>();
     private BeaconManager beaconManager;
+    private static BeaconApplication instance;
+    public final List<TrackedAdapter.TrackRecord> trackedBeaconRecord = new ArrayList<>();
 
     public static BeaconApplication getInstance() {
         return instance;
@@ -31,6 +34,7 @@ public class BeaconApplication extends Application implements BeaconConsumer {
     @Override
     public void onCreate() {
         super.onCreate();
+        instance = this;
         beaconManager = BeaconManager.getInstanceForApplication(this);
         beaconManager.getBeaconParsers().clear();
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(IBEACON_LAYOUT));
@@ -38,39 +42,15 @@ public class BeaconApplication extends Application implements BeaconConsumer {
         BeaconManager.setBeaconSimulator(new MyBeaconSimulator());
     }
 
-
     @Override
     public void onBeaconServiceConnect() {
-        beaconManager.addRangeNotifier(new RangeNotifier() {
-            @Override
-            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-                List<Beacon> beaconList = new ArrayList<>();
-                for (Beacon b : beacons) {
-                    if (isNotTracked(b)) {
-                        beaconList.add(b);
-                    }
-                }
-                getInstance().beacons = beaconList;
-            }
-        });
-
-        try {
-            beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
-        } catch (RemoteException e) {
-            Log.e(TAG, "Unable to range beacons in region" + e.getStackTrace());
-        }
+        stopAllScans();
+        startAutoScan();
     }
 
-    @Override
-    public void onTerminate() {
-        super.onTerminate();
-        beaconManager.unbind(this);
-    }
-
-
-    private boolean isNotTracked(Beacon toTest) {
+    private boolean isAddedToTracked(Beacon toTest) {
         Boolean isTracked = true;
-        for (TrackedAdapter.TrackRecord r : getInstance().trackedBeacons) {
+        for (TrackedAdapter.TrackRecord r : trackedBeaconRecord) {
             if (toTest.getId1().toString().equals(r.getUuid()) &&
                     toTest.getId2().toString().equals(r.getMinor()) &&
                     toTest.getId3().toString().equals(r.getMajor())) {
@@ -79,5 +59,65 @@ public class BeaconApplication extends Application implements BeaconConsumer {
             }
         }
         return isTracked;
+    }
+
+    private void stopAllScans() {
+        try {
+            beaconManager.stopRangingBeaconsInRegion(myRegion);
+        } catch (RemoteException e) {
+            Log.e(TAG, "Unable to range beacons in region" + e.getStackTrace());
+        }
+        beaconManager.removeAllRangeNotifiers();
+    }
+
+    public void startManualRangingScan(IRefresh context) {
+        stopAllScans();
+        ManualNotifier notifier = new ManualNotifier(context);
+        beaconManager.addRangeNotifier(notifier);
+        try {
+            beaconManager.startRangingBeaconsInRegion(myRegion);
+        } catch (RemoteException e) {
+            Log.e(TAG, "Unable to range beacons in region" + e.getStackTrace());
+        }
+    }
+
+    private void startAutoScan() {
+        beaconManager.addRangeNotifier(new RangeNotifier() {
+            @Override
+            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
+                Log.d(TAG, "just did a scan on ranging");
+            }
+        });
+
+        try {
+            beaconManager.startRangingBeaconsInRegion(myRegion);
+        } catch (RemoteException e) {
+            Log.e(TAG, "Unable to range beacons in region" + e.getStackTrace());
+        }
+    }
+
+    /**
+     * This class receives a context when it is first created. It is a variant of RangeNotifier which does only a single
+     * scan before implementing a callback to the context. Requires context to implement IRefresh.z
+     */
+    private class ManualNotifier implements RangeNotifier {
+        private IRefresh context;
+
+        public ManualNotifier(IRefresh context) {
+            this.context = context;
+        }
+
+        @Override
+        public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
+            List<Beacon> untrackedBeaconsFound = new ArrayList<>();
+            for (Beacon b : beacons) {
+                if (isAddedToTracked(b)) {
+                    untrackedBeaconsFound.add(b);
+                }
+            }
+            stopAllScans();
+            startAutoScan();
+            context.refresh(untrackedBeaconsFound);
+        }
     }
 }

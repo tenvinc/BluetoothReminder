@@ -14,16 +14,16 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.project.tenvinc.bluetoothreminder.interfaces.IRefresh;
+
 import org.altbeacon.beacon.Beacon;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class ScanningActivity extends AppCompatActivity implements AddTrackedDialog.FavouritesDialogListener {
+public class ScanningActivity extends AppCompatActivity implements AddTrackedDialog.FavouritesDialogListener, IRefresh {
 
     private static final String TAG = "RangingActivity";
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
-    public static List<Beacon> BEACONS = new ArrayList<>();
     private BeaconListAdapter mAdapter;
 
 
@@ -57,8 +57,12 @@ public class ScanningActivity extends AppCompatActivity implements AddTrackedDia
         refreshBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mAdapter.setData(BeaconApplication.getInstance().beacons);
-                mAdapter.notifyDataSetChanged();
+                try {
+                    IRefresh context = ScanningActivity.this;
+                    BeaconApplication.getInstance().startManualRangingScan(context);
+                } catch (ClassCastException e) {
+                    Log.e(TAG, "Activity referenced does not inherit from IRefresh");
+                }
             }
         });
 
@@ -113,6 +117,13 @@ public class ScanningActivity extends AppCompatActivity implements AddTrackedDia
     public void applyTexts(String name, String uuid, String minor, String major) {
         TrackedAdapter.TrackRecord newBeacon = new TrackedAdapter.TrackRecord(uuid, major, minor,
                 name);
-        BeaconApplication.getInstance().trackedBeacons.add(newBeacon);
+        BeaconApplication.getInstance().trackedBeaconRecord.add(newBeacon);
+        BeaconApplication.getInstance().startManualRangingScan(this);
+    }
+
+    @Override
+    public void refresh(List<Beacon> data) {
+        mAdapter.setData(data);
+        mAdapter.notifyDataSetChanged();
     }
 }
