@@ -12,7 +12,7 @@ import java.util.List;
 
 class TrackedAdapter extends BaseAdapter {
 
-    private List<TrackRecord> trackedBeacons;
+    private List<TrackedBeacon> trackedBeacons;
     private final LayoutInflater inflater;
 
     public TrackedAdapter(Context context) {
@@ -20,7 +20,7 @@ class TrackedAdapter extends BaseAdapter {
         inflater = LayoutInflater.from(context);
     }
 
-    public void setData(List<TrackRecord> data) {
+    public void setData(List<TrackedBeacon> data) {
         this.trackedBeacons = data;
     }
 
@@ -42,7 +42,7 @@ class TrackedAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         convertView = inflater.inflate(R.layout.tracked_list_layout, parent, false);
-        TrackRecord curr = trackedBeacons.get(position);
+        TrackedBeacon curr = trackedBeacons.get(position);
 
         TextView uuidText = convertView.findViewById(R.id.uuidText);
         TextView minorText = convertView.findViewById(R.id.minorText);
@@ -55,41 +55,5 @@ class TrackedAdapter extends BaseAdapter {
         nameText.setText(curr.getBeaconName());
 
         return convertView;
-    }
-
-    public void addItem(String beaconName, String uuid, String minor, String major) {
-        TrackRecord newRecord = new TrackRecord(uuid, major, minor, beaconName);
-        trackedBeacons.add(newRecord);
-    }
-
-    public static class TrackRecord {
-
-        private final String uuid;
-        private final String major;
-        private final String minor;
-        private final String beaconName;
-
-        public TrackRecord(String uuid, String major, String minor, String beaconName) {
-            this.uuid = uuid;
-            this.minor = minor;
-            this.major = major;
-            this.beaconName = beaconName;
-        }
-
-        public String getUuid() {
-            return uuid;
-        }
-
-        public String getMajor() {
-            return major;
-        }
-
-        public String getMinor() {
-            return minor;
-        }
-
-        public String getBeaconName() {
-            return beaconName;
-        }
     }
 }

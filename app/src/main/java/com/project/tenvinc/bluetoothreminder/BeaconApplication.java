@@ -25,7 +25,7 @@ public class BeaconApplication extends Application implements BeaconConsumer {
     public List<Beacon> beacons = new ArrayList<>();
     private BeaconManager beaconManager;
     private static BeaconApplication instance;
-    public final List<TrackedAdapter.TrackRecord> trackedBeaconRecord = new ArrayList<>();
+    public List<TrackedBeacon> trackedBeacons;
 
     public static BeaconApplication getInstance() {
         return instance;
@@ -35,6 +35,7 @@ public class BeaconApplication extends Application implements BeaconConsumer {
     public void onCreate() {
         super.onCreate();
         instance = this;
+        trackedBeacons = new ArrayList<>();
         beaconManager = BeaconManager.getInstanceForApplication(this);
         beaconManager.getBeaconParsers().clear();
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(IBEACON_LAYOUT));
@@ -50,7 +51,7 @@ public class BeaconApplication extends Application implements BeaconConsumer {
 
     private boolean isAddedToTracked(Beacon toTest) {
         Boolean isTracked = true;
-        for (TrackedAdapter.TrackRecord r : trackedBeaconRecord) {
+        for (TrackedBeacon r : trackedBeacons) {
             if (toTest.getId1().toString().equals(r.getUuid()) &&
                     toTest.getId2().toString().equals(r.getMinor()) &&
                     toTest.getId3().toString().equals(r.getMajor())) {
@@ -117,6 +118,7 @@ public class BeaconApplication extends Application implements BeaconConsumer {
             }
             stopAllScans();
             startAutoScan();
+            getInstance().beacons = untrackedBeaconsFound;
             context.refresh(untrackedBeaconsFound);
         }
     }

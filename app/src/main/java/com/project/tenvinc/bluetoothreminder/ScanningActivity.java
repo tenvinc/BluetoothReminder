@@ -47,6 +47,7 @@ public class ScanningActivity extends AppCompatActivity implements AddTrackedDia
                 data.putString("uuid", currBeacon.getId1().toString());
                 data.putString("minor", currBeacon.getId2().toString());
                 data.putString("major", currBeacon.getId3().toString());
+                data.putInt("position", position);
 
                 dialog.setArguments(data);
                 dialog.show(getSupportFragmentManager(), "add to tracked");
@@ -114,10 +115,9 @@ public class ScanningActivity extends AppCompatActivity implements AddTrackedDia
     }
 
     @Override
-    public void applyTexts(String name, String uuid, String minor, String major) {
-        TrackedAdapter.TrackRecord newBeacon = new TrackedAdapter.TrackRecord(uuid, major, minor,
-                name);
-        BeaconApplication.getInstance().trackedBeaconRecord.add(newBeacon);
+    public void applyTexts(Beacon beacon, String beaconName) {
+        TrackedBeacon newBeacon = new TrackedBeacon(beacon, beaconName, 10);
+        BeaconApplication.getInstance().trackedBeacons.add(newBeacon);
         BeaconApplication.getInstance().startManualRangingScan(this);
     }
 

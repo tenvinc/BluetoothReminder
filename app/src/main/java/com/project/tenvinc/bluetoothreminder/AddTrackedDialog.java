@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.altbeacon.beacon.Beacon;
+
 public class AddTrackedDialog extends AppCompatDialogFragment {
 
     private EditText editName;
@@ -20,6 +22,7 @@ public class AddTrackedDialog extends AppCompatDialogFragment {
     private TextView minorText;
     private TextView majorText;
     private FavouritesDialogListener listener;
+    private Beacon ref;
 
     @NonNull
     @Override
@@ -41,10 +44,7 @@ public class AddTrackedDialog extends AppCompatDialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String name = editName.getText().toString();
-                        String uuid = uuidText.getText().toString();
-                        String minor = minorText.getText().toString();
-                        String major = majorText.getText().toString();
-                        listener.applyTexts(name, uuid, minor, major);
+                        listener.applyTexts(ref, name);
                     }
                 });
 
@@ -57,6 +57,7 @@ public class AddTrackedDialog extends AppCompatDialogFragment {
         uuidText.setText(bundle.getString("uuid"));
         minorText.setText(bundle.getString("minor"));
         majorText.setText(bundle.getString("major"));
+        ref = BeaconApplication.getInstance().beacons.get(bundle.getInt("position"));
 
         uuidText.setMovementMethod(new ScrollingMovementMethod());
 
@@ -76,6 +77,6 @@ public class AddTrackedDialog extends AppCompatDialogFragment {
     }
 
     public interface FavouritesDialogListener {
-        void applyTexts(String name, String uuid, String minor, String major);
+        void applyTexts(Beacon beacon, String beaconName);
     }
 }
