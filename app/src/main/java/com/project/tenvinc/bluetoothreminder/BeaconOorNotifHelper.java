@@ -8,19 +8,30 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 
-public class NotificationHelper extends ContextWrapper {
+public class BeaconOorNotifHelper extends ContextWrapper {
 
     public static final String CHANNEL_ID = "Channel Id";
     public static final String CHANNEL_ID_NAME = "Main Channel";
+    public static final String defaultMessageFormat = "\"%s\" is out of range!";
     public static int notificationImageId = R.drawable.ic_warning;
-    private NotificationManager manager;
 
-    public NotificationHelper(Context base) {
+    private static String defaultTitle = "Registered beacon out of range";
+    private static int notificationID = 123;
+
+    private NotificationManager manager;
+    private NotificationManagerCompat managerCompat;
+    private NotificationCompat.Builder builder;
+
+
+    public BeaconOorNotifHelper(Context base) {
         super(base);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChannel();
         }
+        managerCompat = NotificationManagerCompat.from(base);
+        builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID);
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -41,10 +52,14 @@ public class NotificationHelper extends ContextWrapper {
         return manager;
     }
 
-    public NotificationCompat.Builder getChannelNotificationBuilder(String title, String message) {
-        return new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
-                .setContentTitle(title)
-                .setContentText(message)
+    public NotificationCompat.Builder getChannelNotificationBuilder(String beaconName) {
+        builder.setContentTitle(defaultTitle)
+                .setContentText(String.format(defaultMessageFormat, beaconName))
                 .setSmallIcon(notificationImageId);
+        return builder;
+    }
+
+    public void sendNotification(Notification notification) {
+        managerCompat.notify(notificationID, notification);
     }
 }

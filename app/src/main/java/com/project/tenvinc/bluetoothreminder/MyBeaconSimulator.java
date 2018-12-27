@@ -9,7 +9,7 @@ import java.util.List;
 
 public class MyBeaconSimulator implements BeaconSimulator {
 
-    private final List<Beacon> beacons = new ArrayList<>();
+    public final List<Beacon> beacons = new ArrayList<>();
 
     public MyBeaconSimulator() {
         for (int i = 0; i < 10; i++) {

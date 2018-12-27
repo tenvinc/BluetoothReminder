@@ -2,6 +2,7 @@ package com.project.tenvinc.bluetoothreminder;
 
 import android.app.Application;
 import android.os.RemoteException;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.project.tenvinc.bluetoothreminder.interfaces.IRefresh;
@@ -19,13 +20,20 @@ import java.util.List;
 
 public class BeaconApplication extends Application implements BeaconConsumer {
 
+    // To be removed
+    public MyBeaconSimulator simulator;
+
     private static final String IBEACON_LAYOUT = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24";
     private static final String TAG = "BeaconApplication";
     private static final Region myRegion = new Region("myRegion", null, null, null);
-    public List<Beacon> beacons = new ArrayList<>();
     private BeaconManager beaconManager;
     private static BeaconApplication instance;
+
+    public List<Beacon> beacons = new ArrayList<>();
     public List<TrackedBeacon> trackedBeacons;
+
+    private ConstScanNotifHelper constScanNotifHelper;
+    private BeaconOorNotifHelper oorNotifHelper;
 
     public static BeaconApplication getInstance() {
         return instance;
@@ -39,8 +47,15 @@ public class BeaconApplication extends Application implements BeaconConsumer {
         beaconManager = BeaconManager.getInstanceForApplication(this);
         beaconManager.getBeaconParsers().clear();
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(IBEACON_LAYOUT));
+        simulator = new MyBeaconSimulator();
+        BeaconManager.setBeaconSimulator(simulator);
+
+        constScanNotifHelper = new ConstScanNotifHelper(this);
+        NotificationCompat.Builder constBuilder = constScanNotifHelper.getChannelNotificationBuilder();
+        beaconManager.enableForegroundServiceScanning(constBuilder.build(), 456);
         beaconManager.bind(this);
-        BeaconManager.setBeaconSimulator(new MyBeaconSimulator());
+
+        oorNotifHelper = new BeaconOorNotifHelper(this);
     }
 
     @Override
@@ -50,16 +65,21 @@ public class BeaconApplication extends Application implements BeaconConsumer {
     }
 
     private boolean isAddedToTracked(Beacon toTest) {
-        Boolean isTracked = true;
         for (TrackedBeacon r : trackedBeacons) {
-            if (toTest.getId1().toString().equals(r.getUuid()) &&
-                    toTest.getId2().toString().equals(r.getMinor()) &&
-                    toTest.getId3().toString().equals(r.getMajor())) {
-                isTracked = false;
-                break;
+            if (r.isSameBeaconAs(toTest)) {
+                return true;
             }
         }
-        return isTracked;
+        return false;
+    }
+
+    private boolean isTrackedInRange(TrackedBeacon toTest, Collection<Beacon> beacons) {
+        for (Beacon b : beacons) {
+            if (toTest.isSameBeaconAs(b)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void stopAllScans() {
@@ -83,12 +103,7 @@ public class BeaconApplication extends Application implements BeaconConsumer {
     }
 
     private void startAutoScan() {
-        beaconManager.addRangeNotifier(new RangeNotifier() {
-            @Override
-            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-                Log.d(TAG, "just did a scan on ranging");
-            }
-        });
+        beaconManager.addRangeNotifier(new AutoNotifier());
 
         try {
             beaconManager.startRangingBeaconsInRegion(myRegion);
@@ -112,7 +127,7 @@ public class BeaconApplication extends Application implements BeaconConsumer {
         public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
             List<Beacon> untrackedBeaconsFound = new ArrayList<>();
             for (Beacon b : beacons) {
-                if (isAddedToTracked(b)) {
+                if (!isAddedToTracked(b)) {
                     untrackedBeaconsFound.add(b);
                 }
             }
@@ -120,6 +135,24 @@ public class BeaconApplication extends Application implements BeaconConsumer {
             startAutoScan();
             getInstance().beacons = untrackedBeaconsFound;
             context.refresh(untrackedBeaconsFound);
+        }
+    }
+
+    private class AutoNotifier implements RangeNotifier {
+
+        @Override
+        public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
+            for (TrackedBeacon tb : trackedBeacons) {
+                Boolean isInRange = isTrackedInRange(tb, beacons);
+                tb.updateState(isInRange);
+                if (tb.isNotificationNeeded()) {
+                    tb.updateTimer();
+                    NotificationCompat.Builder builder = oorNotifHelper.getChannelNotificationBuilder(tb.getBeaconName());
+                    oorNotifHelper.sendNotification(builder.build());
+                    Log.d(TAG, String.format("Notifying the following ==== %s", tb.toString()));
+                }
+                Log.d(TAG, tb.toString());
+            }
         }
     }
 }
