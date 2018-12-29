@@ -5,4 +5,44 @@
     <string name="title_activity_tracked">ListTrackedActivity</string>
     <string name="main_menu">Main Menu</string>
     <string name="tracked_beacons">Tracked Beacons</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_switch_scan">Enable scan</string>
+    <string name="pref_desc_switch_scan">Enable this to access more settings</string>
+
+    <string name="pref_title_switch_bg">Background mode</string>
+
+    <string name="pref_title_switch_fg">Foreground mode</string>
+    <string name="pref_desc_switch_fg">Scan might not be able to continue for prolonged periods of time in this mode</string>
+
+    <string name="pref_title_switch_bat_saving">Battery saving mode</string>
+
+    <!-- Settings for Notifications -->
+    <string name="pref_header_notifications">Notifications</string>
+
+    <string name="pref_title_system_notif">App notification settings</string>
+
+    <string name="pref_title_notif_freq">Notification frequency</string>
+
+    <string name="pref_title_notif_oor">Beacon out of range notifications</string>
+
+    <string name="pref_title_vibrate">Vibrate</string>
+
+    <string name="pref_header_scan">Scan settings</string>
+
+    <!-- Scan settings -->
+    <string name="pref_title_bg_period">Scan period in background mode</string>
+
+    <string name="pref_title_bg_delay">Scan delay before 1st scan in background mode</string>
+
+    <string name="pref_title_fg_period">Scan period in foreground mode</string>
+
+    <string name="pref_title_fg_delay">Scan delay before 1st scan in foreground mode</string>
+
+
 </resources>

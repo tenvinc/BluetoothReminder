@@ -14,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Button scanBtn;
     private Button listTrackedBtn;
+    private Button settingsBtn;
 
     // Todo: to be removed (For simulation only)
     private Button removeBtn;
@@ -48,6 +49,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 BeaconApplication.getInstance().simulator.beacons.remove(6);
+            }
+        });
+
+        settingsBtn = findViewById(R.id.settings);
+        settingsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
             }
         });
 

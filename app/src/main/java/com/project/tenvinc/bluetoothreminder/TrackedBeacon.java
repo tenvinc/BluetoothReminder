@@ -41,8 +41,9 @@ public class TrackedBeacon {
         if (currState.equals(State.JUST_OUT_OF_RANGE)) {
             return true;
         }
+        Long waitDuration = BeaconApplication.getInstance().getWaitDuration();
         if (currState.equals(State.STILL_OUT_OF_RANGE) && System.currentTimeMillis() / MILLIS_PER_SECOND
-                - lastUpdateTime >= sleepDuration) {
+                - lastUpdateTime >= waitDuration && waitDuration != -1) {
             Log.d(TAG, String.format("%s", System.currentTimeMillis() / MILLIS_PER_SECOND - lastUpdateTime));
             return true;
         }
