@@ -78,10 +78,6 @@ public class TrackedBeacon {
         return beaconName;
     }
 
-    public enum State {
-        UNKNOWN, IN_RANGE, JUST_OUT_OF_RANGE, STILL_OUT_OF_RANGE
-    }
-
     public boolean isSameBeaconAs(Beacon toTest) {
         return toTest.getId1().toString().equals(getUuid())
                 && toTest.getId2().toString().equals(getMinor())
@@ -91,5 +87,9 @@ public class TrackedBeacon {
     @Override
     public String toString() {
         return String.format("%s :: %s :: %s :: %s", beaconName, beacon, currState, lastUpdateTime);
+    }
+
+    public enum State {
+        UNKNOWN, IN_RANGE, JUST_OUT_OF_RANGE, STILL_OUT_OF_RANGE
     }
 }

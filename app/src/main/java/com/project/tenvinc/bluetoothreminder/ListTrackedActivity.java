@@ -12,6 +12,8 @@ public class ListTrackedActivity extends AppCompatActivity {
     private ListView trackedList;
     private Button returnBtn;
     private TrackedAdapter trackedAdapter;
+    public static String TRACKED_BEACON_STORAGE = "TB storage";
+    public static String KEY_TRACKED_BEACONS = "tracked beacons";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

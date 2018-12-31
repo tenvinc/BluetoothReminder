@@ -20,6 +20,7 @@ public class BeaconOorNotifHelper extends ContextWrapper {
     private static String defaultTitle = "Registered beacon out of range";
     private static int notificationID = 123;
 
+    private Boolean isVibrationOn = false;
     private NotificationManager manager;
     private NotificationManagerCompat managerCompat;
     private NotificationCompat.Builder builder;
@@ -61,5 +62,9 @@ public class BeaconOorNotifHelper extends ContextWrapper {
 
     public void sendNotification(Notification notification) {
         managerCompat.notify(notificationID, notification);
+    }
+
+    public void setVibration(Boolean isVibrationOn) {
+        this.isVibrationOn = isVibrationOn;
     }
 }

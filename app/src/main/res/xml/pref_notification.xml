@@ -14,7 +14,7 @@
         android:key="notifications_vibrate"
         android:title="@string/pref_title_vibrate" />
     <ListPreference
-        android:defaultValue="150"
+        android:defaultValue="10"
         android:dependency="notifications_beacon_oor"
         android:entries="@array/pref_list_notif_frequency_titles"
         android:entryValues="@array/pref_list_notif_frequency_values"

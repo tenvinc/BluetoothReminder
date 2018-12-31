@@ -11,9 +11,11 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.RingtonePreference;
 import android.preference.SwitchPreference;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.MenuItem;
 
 import java.util.List;
@@ -32,6 +34,8 @@ import static android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
+
+    public static String TAG = "SettingsActivity";
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
@@ -94,11 +98,20 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 
-    private static void triggerPreferenceSummaryUpdate(Preference preference) {
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                PreferenceManager
-                        .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
+    private static void triggerListenerUpdate(Preference preference) {
+        if (preference instanceof SwitchPreference) {
+            preference.getOnPreferenceChangeListener().onPreferenceChange(preference,
+                    PreferenceManager
+                            .getDefaultSharedPreferences(preference.getContext())
+                            .getBoolean(preference.getKey(), false));
+        } else if (preference instanceof RingtonePreference) {
+            Log.e(TAG, "This should not be happening");
+        } else {
+            preference.getOnPreferenceChangeListener().onPreferenceChange(preference,
+                    PreferenceManager
+                            .getDefaultSharedPreferences(preference.getContext())
+                            .getString(preference.getKey(), ""));
+        }
     }
 
     @Override
@@ -186,7 +199,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     return true;
                 }
             });
-            triggerPreferenceSummaryUpdate(preference);
+            triggerListenerUpdate(preference);
         }
     }
 
@@ -196,6 +209,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public static final String PREF_KEY_SYSTEM_NOTIF = "pref_system_notif";
         public static final String PREF_KEY_NOTIF_FREQUENCY = "pref_notif_frequency";
         public static final String PREF_KEY_SWITCH_NOTIF = "notifications_beacon_oor";
+        public static final String PREF_KEY_SWITCH_VIBRATION = "notifications_vibrate";
 
         @Override
         public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -216,7 +230,17 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     return true;
                 }
             });
-            triggerPreferenceSummaryUpdate(notifPref);
+            triggerListenerUpdate(notifPref);
+
+            Preference vibratePref = findPreference(PREF_KEY_SWITCH_VIBRATION);
+            vibratePref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    sUpdateNotifSettingsListener.onPreferenceChange(preference, newValue);
+                    return true;
+                }
+            });
+            triggerListenerUpdate(vibratePref);
 
             findPreference(PREF_KEY_SWITCH_NOTIF).setOnPreferenceChangeListener(sUpdateNotifSettingsListener);
 

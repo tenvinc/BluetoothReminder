@@ -1,22 +1,34 @@
 package com.project.tenvinc.bluetoothreminder;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDialogFragment;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import org.altbeacon.beacon.Beacon;
 
 import java.util.List;
 
+import static com.project.tenvinc.bluetoothreminder.BeaconStringUtils.getCombinedIdString;
+import static com.project.tenvinc.bluetoothreminder.BeaconStringUtils.getDistString;
+
 public class BeaconListAdapter extends BaseAdapter {
     private final LayoutInflater inflater;
     private List<Beacon> data;
+    private static String TAG = "BeaconListAdapter.class";
+    private final AppCompatActivity context;
 
     public BeaconListAdapter(Context context, List<Beacon> data) {
         inflater = LayoutInflater.from(context);
+        this.context = (AppCompatActivity) context;
         this.data = data;
     }
 
@@ -40,17 +52,40 @@ public class BeaconListAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        convertView = inflater.inflate(R.layout.beacon_list_layout, parent, false);
+    public View getView(final int position, View convertView, final ViewGroup parent) {
+        convertView = inflater.inflate(R.layout.list_scan_result, parent, false);
         Beacon currBeacon = data.get(position);
 
-        TextView uuidText = convertView.findViewById(R.id.uuidText);
-        TextView minorText = convertView.findViewById(R.id.minorText);
-        TextView majorText = convertView.findViewById(R.id.majorText);
+        TextView idText = convertView.findViewById(R.id.idText);
+        TextView distText = convertView.findViewById(R.id.distText);
+        final ImageView image_options = convertView.findViewById(R.id.image_options);
 
-        uuidText.setText(currBeacon.getId1().toString());
-        minorText.setText(currBeacon.getId2().toString());
-        majorText.setText(currBeacon.getId3().toString());
+        idText.setText(getCombinedIdString(currBeacon));
+        distText.setText(getDistString(currBeacon));
+
+        image_options.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                PopupMenu popupMenu = new PopupMenu(v.getContext(), v);
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        MoreInfoDialog dialog = new MoreInfoDialog();
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("position", position);
+                        dialog.setArguments(bundle);
+                        showDialog(dialog);
+                        return true;
+                    }
+                });
+                popupMenu.inflate(R.menu.beacon_options);
+                popupMenu.show();
+            }
+        });
         return convertView;
+    }
+
+    private void showDialog(AppCompatDialogFragment dialogFragment) {
+        dialogFragment.show(context.getSupportFragmentManager(), "");
     }
 }

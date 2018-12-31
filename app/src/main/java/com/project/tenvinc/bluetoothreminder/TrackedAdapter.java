@@ -12,8 +12,8 @@ import java.util.List;
 
 class TrackedAdapter extends BaseAdapter {
 
-    private List<TrackedBeacon> trackedBeacons;
     private final LayoutInflater inflater;
+    private List<TrackedBeacon> trackedBeacons;
 
     public TrackedAdapter(Context context) {
         trackedBeacons = new ArrayList<>();

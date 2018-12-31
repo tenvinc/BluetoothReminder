@@ -30,7 +30,7 @@ public class AddTrackedDialog extends AppCompatDialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.favourite_dialog_layout, null);
+        View view = inflater.inflate(R.layout.dialog_fav, null);
 
         builder.setView(view)
                 .setTitle("Add to tracked beacons")
@@ -44,7 +44,7 @@ public class AddTrackedDialog extends AppCompatDialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String name = editName.getText().toString();
-                        listener.applyTexts(ref, name);
+                        listener.applyAddition(ref, name);
                     }
                 });
 
@@ -77,6 +77,6 @@ public class AddTrackedDialog extends AppCompatDialogFragment {
     }
 
     public interface FavouritesDialogListener {
-        void applyTexts(Beacon beacon, String beaconName);
+        void applyAddition(Beacon beacon, String beaconName);
     }
 }

@@ -9,24 +9,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Major:"
-        app:layout_constraintStart_toStartOf="@+id/minorLabel"
+        android:text="Type:"
+        app:layout_constraintStart_toStartOf="@+id/majorLabel"
         app:layout_constraintTop_toBottomOf="@+id/majorLabel" />
 
     <TextView
         android:id="@+id/distText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="10 m away"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="@+id/typeLabel"
-        app:layout_constraintEnd_toEndOf="@+id/majorText"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/majorText"
-        app:layout_constraintTop_toTopOf="@+id/typeLabel" />
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="5dp"
+        android:text="Dist. of 10.0m away"
+        android:textAlignment="viewStart"
+        app:layout_constraintEnd_toEndOf="@+id/majorDialogText2"
+        app:layout_constraintStart_toStartOf="@+id/typeLabel"
+        app:layout_constraintTop_toBottomOf="@+id/typeLabel" />
 
     <TextView
-        android:id="@+id/majorText"
+        android:id="@+id/majorDialogText"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:text="1"
@@ -37,10 +37,21 @@
         app:layout_constraintTop_toTopOf="@+id/majorLabel" />
 
     <TextView
+        android:id="@+id/majorDialogText2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="iBeacon"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="@+id/typeLabel"
+        app:layout_constraintEnd_toEndOf="@+id/majorDialogText"
+        app:layout_constraintStart_toStartOf="@+id/majorDialogText"
+        app:layout_constraintTop_toTopOf="@+id/typeLabel" />
+
+    <TextView
         android:id="@+id/majorLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="5dp"
         android:text="Major:"
         app:layout_constraintStart_toStartOf="@+id/minorLabel"
         app:layout_constraintTop_toBottomOf="@+id/minorLabel" />
@@ -49,7 +60,7 @@
         android:id="@+id/minorLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="5dp"
         android:text="Minor:"
         app:layout_constraintStart_toStartOf="@+id/uuidLabel"
         app:layout_constraintTop_toBottomOf="@+id/uuidLabel" />
@@ -57,8 +68,8 @@
     <TextView
         android:id="@+id/minorText"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="1"
+        android:layout_height="0dp"
+        android:text="TextView"
         android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="@+id/minorLabel"
         app:layout_constraintEnd_toEndOf="@+id/uuidText"
@@ -69,10 +80,11 @@
         android:id="@+id/uuidLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="16dp"
         android:text="UUID:"
-        app:layout_constraintStart_toStartOf="@+id/nameText"
-        app:layout_constraintTop_toBottomOf="@+id/nameText" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/uuidText"
@@ -83,28 +95,12 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:scrollbars="horizontal"
-        android:text="AVeryLongBeaconNameAVeryLongBeaconNameAVeryLongBeaconNameAVeryLongBeaconNameAVeryLongBeaconNameAVeryLongBeaconNameAVeryLongBeaconName"
+        android:text="TextView"
         android:textAlignment="center"
-        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/uuidLabel"
-        app:layout_constraintEnd_toEndOf="@+id/nameText"
-        app:layout_constraintStart_toEndOf="@+id/uuidLabel"
-        app:layout_constraintTop_toTopOf="@+id/uuidLabel" />
-
-    <TextView
-        android:id="@+id/nameText"
-        android:layout_width="346dp"
-        android:layout_height="22dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:minWidth="200dp"
-        android:text="AVeryLongBeaconNameAVeryLongBeaconNameAVeryLongBeaconName"
-        android:textStyle="bold|italic"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/uuidLabel"
+        app:layout_constraintTop_toTopOf="@+id/uuidLabel"
+        app:layout_constraintVertical_bias="0.0" />
 
 </android.support.constraint.ConstraintLayout>

@@ -5,6 +5,16 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/distText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="10.0 m away"
+        app:layout_constraintEnd_toEndOf="@+id/minorText"
+        app:layout_constraintStart_toStartOf="@+id/minorText"
+        app:layout_constraintTop_toBottomOf="@+id/minorText" />
+
+    <TextView
         android:id="@+id/uuidText"
         android:layout_width="281dp"
         android:layout_height="wrap_content"

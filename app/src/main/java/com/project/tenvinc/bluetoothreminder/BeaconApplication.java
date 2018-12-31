@@ -7,6 +7,8 @@ import android.preference.Preference;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.project.tenvinc.bluetoothreminder.interfaces.IRefresh;
 
 import org.altbeacon.beacon.Beacon;
@@ -17,16 +19,20 @@ import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
+import static com.project.tenvinc.bluetoothreminder.ListTrackedActivity.KEY_TRACKED_BEACONS;
+import static com.project.tenvinc.bluetoothreminder.ListTrackedActivity.TRACKED_BEACON_STORAGE;
 import static com.project.tenvinc.bluetoothreminder.SettingsActivity.GeneralPreferenceFragment.PREF_KEY_SWITCH_BG;
 import static com.project.tenvinc.bluetoothreminder.SettingsActivity.GeneralPreferenceFragment.PREF_KEY_SWITCH_FG;
 import static com.project.tenvinc.bluetoothreminder.SettingsActivity.GeneralPreferenceFragment.PREF_KEY_SWITCH_SCAN;
 import static com.project.tenvinc.bluetoothreminder.SettingsActivity.NotificationPreferenceFragment.PREF_KEY_NOTIF_FREQUENCY;
 import static com.project.tenvinc.bluetoothreminder.SettingsActivity.NotificationPreferenceFragment.PREF_KEY_SWITCH_NOTIF;
+import static com.project.tenvinc.bluetoothreminder.SettingsActivity.NotificationPreferenceFragment.PREF_KEY_SWITCH_VIBRATION;
 import static com.project.tenvinc.bluetoothreminder.SettingsActivity.ScanPreferenceFragment.PREF_KEY_BG_DELAY;
 import static com.project.tenvinc.bluetoothreminder.SettingsActivity.ScanPreferenceFragment.PREF_KEY_BG_PERIOD;
 import static com.project.tenvinc.bluetoothreminder.SettingsActivity.ScanPreferenceFragment.PREF_KEY_FG_DELAY;
@@ -34,19 +40,18 @@ import static com.project.tenvinc.bluetoothreminder.SettingsActivity.ScanPrefere
 
 public class BeaconApplication extends Application implements BeaconConsumer {
 
-    // To be removed
-    public MyBeaconSimulator simulator;
-
     private static final String IBEACON_LAYOUT = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24";
     private static final String TAG = "BeaconApplication";
     private static final Region myRegion = new Region("myRegion", null, null, null);
-    private BeaconManager beaconManager;
     private static BeaconApplication instance;
-    private BackgroundPowerSaver backgroundPowerSaver;
-
+    // To be removed
+    public MyBeaconSimulator simulator;
     public List<Beacon> beacons = new ArrayList<>();
     public List<TrackedBeacon> trackedBeacons;
+    private BeaconManager beaconManager;
+    private BackgroundPowerSaver backgroundPowerSaver;
 
+    // Notification settings
     private ConstScanNotifHelper constScanNotifHelper;
     private BeaconOorNotifHelper oorNotifHelper;
     private Long waitDuration;
@@ -73,32 +78,14 @@ public class BeaconApplication extends Application implements BeaconConsumer {
         oorNotifHelper = new BeaconOorNotifHelper(this);
 
         SharedPreferences sharedPreferences = getDefaultSharedPreferences(this);
+        trackedBeacons = loadTrackedBeacons();
 
         waitDuration = Long.parseLong(sharedPreferences.getString(PREF_KEY_NOTIF_FREQUENCY, "-1"));
-
+        isNotifOn = sharedPreferences.getBoolean(PREF_KEY_SWITCH_NOTIF, true);
 
         if (sharedPreferences.getBoolean(PREF_KEY_SWITCH_FG, false)) {
-
-            Long fgDelay = Long.parseLong(sharedPreferences.getString(PREF_KEY_BG_DELAY, "-1"));
-            if (fgDelay != -1) {
-                beaconManager.setForegroundScanPeriod(fgDelay);
-            }
-            Long fgPeriod = Long.parseLong(sharedPreferences.getString(PREF_KEY_FG_PERIOD, "-1"));
-            if (fgPeriod != -1) {
-                beaconManager.setForegroundScanPeriod(fgPeriod);
-            }
             beaconManager.enableForegroundServiceScanning(constBuilder.build(), 456);
 
-        } else {
-
-            Long bgPeriod = Long.parseLong(sharedPreferences.getString(PREF_KEY_BG_PERIOD, "-1"));
-            if (bgPeriod != -1) {
-                beaconManager.setBackgroundScanPeriod(bgPeriod);
-            }
-            Long bgDelay = Long.parseLong(sharedPreferences.getString(PREF_KEY_BG_DELAY, "-1"));
-            if (bgDelay != -1) {
-                beaconManager.setBackgroundBetweenScanPeriod(bgDelay);
-            }
         }
 
         beaconManager.bind(this);
@@ -176,6 +163,8 @@ public class BeaconApplication extends Application implements BeaconConsumer {
             waitDuration = Long.parseLong((String) value);
         } else if (preference.getKey().equals(PREF_KEY_SWITCH_NOTIF)) {
             isNotifOn = (Boolean) value;
+        } else if (preference.getKey().equals(PREF_KEY_SWITCH_VIBRATION)) {
+            oorNotifHelper.setVibration((Boolean) value);
         }
     }
 
@@ -257,6 +246,25 @@ public class BeaconApplication extends Application implements BeaconConsumer {
         }
     }
 
+    public void saveTrackedBeacons(List<TrackedBeacon> trackedBeacons) {
+        SharedPreferences sharedPreferences = getSharedPreferences(TRACKED_BEACON_STORAGE, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(trackedBeacons);
+        editor.putString(KEY_TRACKED_BEACONS, json);
+        editor.apply();
+    }
+
+    public List<TrackedBeacon> loadTrackedBeacons() {
+        SharedPreferences sharedPreferences = getSharedPreferences(TRACKED_BEACON_STORAGE, MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString(KEY_TRACKED_BEACONS, null);
+        Type type = new TypeToken<ArrayList<TrackedBeacon>>() {
+        }.getType();
+        ArrayList<TrackedBeacon> data = gson.fromJson(json, type);
+        return (data == null) ? new ArrayList<TrackedBeacon>() : data;
+    }
+
     private class AutoNotifier implements RangeNotifier {
 
         @Override
@@ -265,7 +273,7 @@ public class BeaconApplication extends Application implements BeaconConsumer {
                 Boolean isInRange = isTrackedInRange(tb, beacons);
                 tb.updateState(isInRange);
                 Log.d(TAG, isInRange.toString());
-                if (isNotifOn && tb.isNotificationNeeded()) {
+                if (isNotifOn & tb.isNotificationNeeded()) {
                     tb.updateTimer();
                     NotificationCompat.Builder builder = oorNotifHelper.getChannelNotificationBuilder(tb.getBeaconName());
                     oorNotifHelper.sendNotification(builder.build());
