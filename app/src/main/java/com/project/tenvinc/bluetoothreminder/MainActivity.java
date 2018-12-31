@@ -20,6 +20,7 @@ import java.util.Arrays;
 public class MainActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 123;
+    private static final int PERMISSION_REQUEST_INTERNET = 234;
 
     private Button scanBtn;
     private Button listTrackedBtn;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        BeaconApplication.getInstance().onStart();
         setContentView(R.layout.activity_main);
 
         scanBtn = findViewById(R.id.scanBtn);
@@ -107,6 +109,21 @@ public class MainActivity extends AppCompatActivity {
             });
             builder.show();
         }
+        if (activity.checkSelfPermission(Manifest.permission.INTERNET)
+                != PackageManager.PERMISSION_GRANTED) {
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(activity);
+            builder.setTitle("This app requires internet access");
+            builder.setMessage("Please grant internet access so this app can better calculate distance.");
+            builder.setPositiveButton(android.R.string.ok, null);
+            builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    activity.requestPermissions(new String[]{Manifest.permission.INTERNET},
+                            PERMISSION_REQUEST_INTERNET);
+                }
+            });
+            builder.show();
+        }
     }
 
     @Override
@@ -130,8 +147,31 @@ public class MainActivity extends AppCompatActivity {
                     builder.show();
                 }
                 return;
+            case PERMISSION_REQUEST_INTERNET:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "internet permission granted");
+                } else {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Functionality limited");
+                    builder.setMessage("Since internet access has not been granted, this app may not be able to compute distance accurately.");
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+
+                        }
+                    });
+                    builder.show();
+                }
+                return;
             default:
                 Log.e(TAG, "Something has gone wrong");
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        BeaconApplication.getInstance().onDestroy();
     }
 }

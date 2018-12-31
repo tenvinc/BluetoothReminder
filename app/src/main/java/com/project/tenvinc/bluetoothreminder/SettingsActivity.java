@@ -195,7 +195,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, newValue);
-                    sOnOffBeaconScanningListener.onPreferenceChange(preference, newValue);
+                    sUpdateBeaconManagerListener.onPreferenceChange(preference, newValue);
                     return true;
                 }
             });

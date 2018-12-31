@@ -7,6 +7,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.project.tenvinc.bluetoothreminder.interfaces.IListListener;
+
+import java.util.List;
+
 public class ListTrackedActivity extends AppCompatActivity {
 
     private ListView trackedList;
@@ -32,12 +36,20 @@ public class ListTrackedActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        BeaconApplication.getInstance().trackedBeacons.addListeners(new IListListener<TrackedBeacon>() {
+            @Override
+            public void trigger(List<TrackedBeacon> list) {
+                trackedAdapter.setData(list);
+                trackedAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        trackedAdapter.setData(BeaconApplication.getInstance().trackedBeacons);
+        trackedAdapter.setData(BeaconApplication.getInstance().trackedBeacons.getList());
         trackedAdapter.notifyDataSetChanged();
     }
 }

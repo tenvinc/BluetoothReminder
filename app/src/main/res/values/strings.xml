@@ -43,6 +43,17 @@
     <string name="pref_title_fg_period">Scan period in foreground mode</string>
 
     <string name="pref_title_fg_delay">Scan delay before 1st scan in foreground mode</string>
+    <string name="beacons_found_title">Beacons found</string>
+    <string name="scan_for_new_beacons">Scan for new beacons</string>
+    <string name="see_tracked_beacons">See Tracked beacons</string>
+    <string name="remove">remove</string>
+    <string name="add">add</string>
+    <string name="settings">Settings</string>
+    <string name="major_label">Major:</string>
+    <string name="minor_label">Minor:</string>
+    <string name="uuid_label">UUID:</string>
+    <string name="type_label">Type:</string>
+    <string name="id_label">ID:</string>
 
 
 </resources>

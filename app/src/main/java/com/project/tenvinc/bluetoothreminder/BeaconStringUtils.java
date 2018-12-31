@@ -22,7 +22,11 @@ public class BeaconStringUtils {
 
     public static String getDistString(Beacon beacon) {
         Double dist = beacon.getDistance();
-        if (beacon.getDistance() >= 0) {
+        return getDistString(dist);
+    }
+
+    public static String getDistString(Double dist) {
+        if (dist >= 0) {
             return String.format("Dist. of %.2f m away", dist);
         } else {
             return "Not in range";

@@ -41,18 +41,16 @@ class TrackedAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        convertView = inflater.inflate(R.layout.tracked_list_layout, parent, false);
+        convertView = inflater.inflate(R.layout.list_tracked, parent, false);
         TrackedBeacon curr = trackedBeacons.get(position);
 
-        TextView uuidText = convertView.findViewById(R.id.uuidText);
-        TextView minorText = convertView.findViewById(R.id.minorText);
-        TextView majorText = convertView.findViewById(R.id.majorText);
+        TextView idText = convertView.findViewById(R.id.idText);
         TextView nameText = convertView.findViewById(R.id.nameText);
+        TextView distText = convertView.findViewById(R.id.distText);
 
-        uuidText.setText(curr.getUuid());
-        minorText.setText(curr.getMinor());
-        majorText.setText(curr.getMajor());
+        idText.setText(curr.getUuid());
         nameText.setText(curr.getBeaconName());
+        distText.setText(curr.getDistance());
 
         return convertView;
     }

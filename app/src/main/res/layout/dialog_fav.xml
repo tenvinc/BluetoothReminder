@@ -8,7 +8,6 @@
         android:id="@+id/majorDialogText"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="1"
         android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="@+id/majorLabel"
         app:layout_constraintEnd_toEndOf="@+id/minorText"
@@ -20,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:text="Major:"
+        android:text="@string/major_label"
         app:layout_constraintStart_toStartOf="@+id/minorLabel"
         app:layout_constraintTop_toBottomOf="@+id/minorLabel" />
 
@@ -29,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:text="Minor:"
+        android:text="@string/minor_label"
         app:layout_constraintStart_toStartOf="@+id/uuidLabel"
         app:layout_constraintTop_toBottomOf="@+id/uuidLabel" />
 
@@ -37,7 +36,6 @@
         android:id="@+id/minorText"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="TextView"
         android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="@+id/minorLabel"
         app:layout_constraintEnd_toEndOf="@+id/uuidText"
@@ -49,7 +47,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:text="UUID:"
+        android:text="@string/uuid_label"
         app:layout_constraintStart_toStartOf="@+id/editName"
         app:layout_constraintTop_toBottomOf="@+id/editName" />
 
@@ -61,7 +59,6 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:scrollbars="horizontal"
-        android:text="TextView"
         android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="@+id/uuidLabel"
         app:layout_constraintEnd_toEndOf="@+id/editName"

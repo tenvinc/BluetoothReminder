@@ -5,26 +5,42 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/nameText"
+        android:layout_width="320dp"
+        android:layout_height="22dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:minWidth="200dp"
+        android:text="AVeryLongBeaconNameAVeryLongBeaconNameAVeryLongBeaconName"
+        android:textStyle="bold|italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
         android:id="@+id/label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="5dp"
         android:text="@string/id_label"
         app:layout_constraintBottom_toBottomOf="@+id/idText"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/nameText"
         app:layout_constraintTop_toTopOf="@+id/idText" />
 
     <TextView
         android:id="@+id/idText"
-        android:layout_width="0dp"
+        android:layout_width="287dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="28dp"
-        android:layout_marginEnd="8dp"
         android:text="6fb0e0e9-2ae6-49d3-bba3-3cb7698c77e2/ 1/ 1"
-        app:layout_constraintEnd_toStartOf="@+id/image_options"
+        app:layout_constraintEnd_toEndOf="@+id/nameText"
         app:layout_constraintStart_toEndOf="@+id/label"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/nameText" />
 
     <TextView
         android:id="@+id/distText"
@@ -39,16 +55,23 @@
         app:layout_constraintStart_toStartOf="@+id/label"
         app:layout_constraintTop_toBottomOf="@+id/idText" />
 
+    <Switch
+        android:id="@+id/switch_track"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Off/On"
+        app:layout_constraintEnd_toEndOf="@+id/nameText"
+        app:layout_constraintTop_toBottomOf="@+id/distText" />
+
     <ImageView
         android:id="@+id/image_options"
         android:layout_width="29dp"
         android:layout_height="36dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/distText"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/idText"
-        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_more_vert_black_24dp" />
 
 </android.support.constraint.ConstraintLayout>

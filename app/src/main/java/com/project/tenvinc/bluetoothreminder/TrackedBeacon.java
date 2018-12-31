@@ -4,15 +4,20 @@ import android.util.Log;
 
 import org.altbeacon.beacon.Beacon;
 
+import static com.project.tenvinc.bluetoothreminder.BeaconStringUtils.getDistString;
+
 public class TrackedBeacon {
 
     private static final long MILLIS_PER_SECOND = 1000;
+    private static final int THRESHOLD_COUNT = 5;
     private final String TAG = this.getClass().getName();
     private long sleepDuration = 10;  // Specify how long beacon notifications will sleep for after a notification in seconds
     private long lastUpdateTime;  // last time when notification was fired in seconds
     private Beacon beacon;
     private String beaconName;
     private State currState;
+    private Double currDist;
+    private int disconnectCount = 0;
 
     public TrackedBeacon(Beacon beacon, String beaconName, long sleepDuration) {
         this.beacon = beacon;
@@ -20,13 +25,22 @@ public class TrackedBeacon {
         this.sleepDuration = sleepDuration;
         currState = State.UNKNOWN;
         lastUpdateTime = -1;  //Time is not updated until first notification
+        this.currDist = beacon.getDistance();
     }
 
     public void updateState(Boolean isInRange) {
         switch (currState) {
             case UNKNOWN:
             case IN_RANGE:
-                currState = (isInRange) ? State.IN_RANGE : State.JUST_OUT_OF_RANGE;
+                if (isInRange) {
+                    currState = State.IN_RANGE;
+                    disconnectCount = 0;
+                } else if (!isInRange && disconnectCount <= THRESHOLD_COUNT) {
+                    currState = State.UNKNOWN;
+                    disconnectCount++;
+                } else {
+                    currState = State.JUST_OUT_OF_RANGE;
+                }
                 break;
             case JUST_OUT_OF_RANGE:
             case STILL_OUT_OF_RANGE:
@@ -35,6 +49,10 @@ public class TrackedBeacon {
             default:
                 Log.d(TAG, "This should not be happening. Please check your enums again.");
         }
+    }
+
+    public void updateDist(Beacon beacon, Boolean isInRange) {
+        currDist = isInRange ? beacon.getDistance() : -1.0;
     }
 
     public Boolean isNotificationNeeded() {
@@ -54,8 +72,7 @@ public class TrackedBeacon {
      * Updates the lastUpdateTime with the current time
      */
     public void updateTimer() {
-        long timeNow = System.currentTimeMillis() / MILLIS_PER_SECOND;
-        lastUpdateTime = timeNow;
+        lastUpdateTime = System.currentTimeMillis() / MILLIS_PER_SECOND;
     }
 
     public Beacon getBeacon() {
@@ -76,6 +93,10 @@ public class TrackedBeacon {
 
     public String getBeaconName() {
         return beaconName;
+    }
+
+    public String getDistance() {
+        return getDistString(currDist);
     }
 
     public boolean isSameBeaconAs(Beacon toTest) {

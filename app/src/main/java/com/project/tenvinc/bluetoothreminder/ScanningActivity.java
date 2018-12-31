@@ -63,10 +63,10 @@ public class ScanningActivity extends AppCompatActivity implements AddTrackedDia
     @Override
     public void applyAddition(Beacon beacon, String beaconName) {
         TrackedBeacon newBeacon = new TrackedBeacon(beacon, beaconName, 10);
-        BeaconApplication.getInstance().trackedBeacons.add(newBeacon);
+        BeaconApplication.getInstance().trackedBeacons.getList().add(newBeacon);
         BeaconApplication.getInstance().startManualRangingScan(this);
 
-        BeaconApplication.getInstance().saveTrackedBeacons(BeaconApplication.getInstance().trackedBeacons);
+        BeaconApplication.getInstance().saveTrackedBeacons(BeaconApplication.getInstance().trackedBeacons.getList());
     }
 
     @Override

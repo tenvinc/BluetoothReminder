@@ -8,7 +8,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import org.altbeacon.beacon.Beacon;
@@ -19,7 +18,6 @@ import static com.project.tenvinc.bluetoothreminder.BeaconStringUtils.getMinorSt
 import static com.project.tenvinc.bluetoothreminder.BeaconStringUtils.getUuidString;
 
 public class MoreInfoDialog extends AppCompatDialogFragment {
-    private EditText editName;
     private TextView uuidText;
     private TextView minorText;
     private TextView majorText;
@@ -43,7 +41,6 @@ public class MoreInfoDialog extends AppCompatDialogFragment {
                     }
                 });
 
-        editName = view.findViewById(R.id.editName);
         uuidText = view.findViewById(R.id.uuidText);
         minorText = view.findViewById(R.id.minorText);
         majorText = view.findViewById(R.id.majorDialogText);
