@@ -54,11 +54,11 @@ public class BeaconListAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         convertView = inflater.inflate(R.layout.list_scan_result, parent, false);
-        Beacon currBeacon = data.get(position);
+        final Beacon currBeacon = data.get(position);
 
         TextView idText = convertView.findViewById(R.id.idText);
         TextView distText = convertView.findViewById(R.id.distText);
-        final ImageView image_options = convertView.findViewById(R.id.image_options);
+        final ImageView image_options = convertView.findViewById(R.id.options);
 
         idText.setText(getCombinedIdString(currBeacon));
         distText.setText(getDistString(currBeacon));
@@ -72,7 +72,7 @@ public class BeaconListAdapter extends BaseAdapter {
                     public boolean onMenuItemClick(MenuItem item) {
                         MoreInfoDialog dialog = new MoreInfoDialog();
                         Bundle bundle = new Bundle();
-                        bundle.putInt("position", position);
+                        bundle.putParcelable("parcel", new BeaconInfo(currBeacon));
                         dialog.setArguments(bundle);
                         showDialog(dialog);
                         return true;

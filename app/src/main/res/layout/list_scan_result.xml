@@ -22,7 +22,7 @@
         android:layout_marginTop="28dp"
         android:layout_marginEnd="8dp"
         android:text="6fb0e0e9-2ae6-49d3-bba3-3cb7698c77e2/ 1/ 1"
-        app:layout_constraintEnd_toStartOf="@+id/image_options"
+        app:layout_constraintEnd_toStartOf="@+id/options"
         app:layout_constraintStart_toEndOf="@+id/label"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -40,7 +40,7 @@
         app:layout_constraintTop_toBottomOf="@+id/idText" />
 
     <ImageView
-        android:id="@+id/image_options"
+        android:id="@+id/options"
         android:layout_width="29dp"
         android:layout_height="36dp"
         android:layout_marginEnd="5dp"

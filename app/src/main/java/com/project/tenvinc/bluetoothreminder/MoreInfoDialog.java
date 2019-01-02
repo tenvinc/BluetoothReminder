@@ -12,11 +12,6 @@ import android.widget.TextView;
 
 import org.altbeacon.beacon.Beacon;
 
-import static com.project.tenvinc.bluetoothreminder.BeaconStringUtils.getDistString;
-import static com.project.tenvinc.bluetoothreminder.BeaconStringUtils.getMajorString;
-import static com.project.tenvinc.bluetoothreminder.BeaconStringUtils.getMinorString;
-import static com.project.tenvinc.bluetoothreminder.BeaconStringUtils.getUuidString;
-
 public class MoreInfoDialog extends AppCompatDialogFragment {
     private TextView uuidText;
     private TextView minorText;
@@ -47,11 +42,11 @@ public class MoreInfoDialog extends AppCompatDialogFragment {
         distText = view.findViewById(R.id.distText);
 
         Bundle bundle = getArguments();
-        ref = BeaconApplication.getInstance().beacons.get(bundle.getInt("position"));
-        uuidText.setText(getUuidString(ref));
-        minorText.setText(getMinorString(ref));
-        majorText.setText(getMajorString(ref));
-        distText.setText(getDistString(ref));
+        BeaconInfo beaconInfo = bundle.getParcelable("parcel");
+        uuidText.setText(beaconInfo.getUuid());
+        minorText.setText(beaconInfo.getMinor());
+        majorText.setText(beaconInfo.getMajor());
+        distText.setText(beaconInfo.getDist());
 
         return builder.create();
     }

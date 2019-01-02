@@ -3,6 +3,10 @@ package com.project.tenvinc.bluetoothreminder;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -13,6 +17,7 @@ import java.util.List;
 
 public class ListTrackedActivity extends AppCompatActivity {
 
+    private static final String TAG = "ListTrackedActivity";
     private ListView trackedList;
     private Button returnBtn;
     private TrackedAdapter trackedAdapter;
@@ -44,6 +49,16 @@ public class ListTrackedActivity extends AppCompatActivity {
                 trackedAdapter.notifyDataSetChanged();
             }
         });
+
+        setupActionBar();
+    }
+
+    private void setupActionBar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("List tracked beacons");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
     }
 
     @Override
@@ -51,5 +66,25 @@ public class ListTrackedActivity extends AppCompatActivity {
         super.onResume();
         trackedAdapter.setData(BeaconApplication.getInstance().trackedBeacons.getList());
         trackedAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.toolbar_options, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                startActivity(new Intent(this, MainActivity.class));
+                return true;
+            case R.id.settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

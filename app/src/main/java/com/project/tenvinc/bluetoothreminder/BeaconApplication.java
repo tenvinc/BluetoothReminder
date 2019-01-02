@@ -48,7 +48,7 @@ public class BeaconApplication extends Application implements BeaconConsumer {
     // To be removed
     public MyBeaconSimulator simulator;
     public List<Beacon> beacons = new ArrayList<>();
-    public ObservableListWrapper<TrackedBeacon> trackedBeacons;
+    public UniqueTrackedBeaconList trackedBeacons;
     private BeaconManager beaconManager;
     private BackgroundPowerSaver backgroundPowerSaver;
 
@@ -66,12 +66,11 @@ public class BeaconApplication extends Application implements BeaconConsumer {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        trackedBeacons = new ObservableListWrapper<>();
         beaconManager = BeaconManager.getInstanceForApplication(this);
         beaconManager.getBeaconParsers().clear();
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(IBEACON_LAYOUT));
         simulator = new MyBeaconSimulator();
-        //BeaconManager.setBeaconSimulator(simulator);
+        BeaconManager.setBeaconSimulator(simulator);
 
         constScanNotifHelper = new ConstScanNotifHelper(this);
         NotificationCompat.Builder constBuilder = constScanNotifHelper.getChannelNotificationBuilder();
@@ -79,7 +78,7 @@ public class BeaconApplication extends Application implements BeaconConsumer {
         oorNotifHelper = new BeaconOorNotifHelper(this);
 
         SharedPreferences sharedPreferences = getDefaultSharedPreferences(this);
-        trackedBeacons.setList(loadTrackedBeacons());
+        trackedBeacons = new UniqueTrackedBeaconList(loadTrackedBeacons());
 
         waitDuration = Long.parseLong(sharedPreferences.getString(PREF_KEY_NOTIF_FREQUENCY, "-1"));
         isNotifOn = sharedPreferences.getBoolean(PREF_KEY_SWITCH_NOTIF, true);
@@ -206,15 +205,6 @@ public class BeaconApplication extends Application implements BeaconConsumer {
         }
     }
 
-    private boolean isAddedToTracked(Beacon toTest) {
-        for (TrackedBeacon r : trackedBeacons.getList()) {
-            if (r.isSameBeaconAs(toTest)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private Beacon findTrackedInRange(TrackedBeacon toTest, Collection<Beacon> beacons) {
         for (Beacon b : beacons) {
             if (toTest.isSameBeaconAs(b)) {
@@ -258,30 +248,15 @@ public class BeaconApplication extends Application implements BeaconConsumer {
         }
     }
 
-    /**
-     * This class receives a context when it is first created. It is a variant of RangeNotifier which does only a single
-     * scan before implementing a callback to the context. Requires context to implement IRefresh.z
-     */
-    private class ManualNotifier implements RangeNotifier {
-        private IRefresh context;
+    public interface ObservableListWrapper<E> {
 
-        public ManualNotifier(IRefresh context) {
-            this.context = context;
-        }
+        void triggerListener();
 
-        @Override
-        public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-            List<Beacon> untrackedBeaconsFound = new ArrayList<>();
-            for (Beacon b : beacons) {
-                if (!isAddedToTracked(b)) {
-                    untrackedBeaconsFound.add(b);
-                }
-            }
-            stopAllScans();
-            startAutoScan();
-            getInstance().beacons = untrackedBeaconsFound;
-            context.refresh(untrackedBeaconsFound);
-        }
+        void addListeners(IListListener<E> listener);
+
+        void removeListener(IListListener<E> listener);
+
+        void removeAllListeners();
     }
 
     public void saveTrackedBeacons(List<TrackedBeacon> trackedBeacons) {
@@ -303,14 +278,41 @@ public class BeaconApplication extends Application implements BeaconConsumer {
         return (data == null) ? new ArrayList<TrackedBeacon>() : data;
     }
 
+    /**
+     * This class receives a context when it is first created. It is a variant of RangeNotifier which does only a single
+     * scan before implementing a callback to the context. Requires context to implement IRefresh.z
+     */
+    private class ManualNotifier implements RangeNotifier {
+        private IRefresh context;
+
+        public ManualNotifier(IRefresh context) {
+            this.context = context;
+        }
+
+        @Override
+        public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
+            List<Beacon> untrackedBeaconsFound = new ArrayList<>();
+            for (Beacon b : beacons) {
+                if (!trackedBeacons.isInList(b)) {
+                    untrackedBeaconsFound.add(b);
+                }
+            }
+            stopAllScans();
+            startAutoScan();
+            getInstance().beacons = untrackedBeaconsFound;
+            context.refresh(untrackedBeaconsFound);
+        }
+    }
+
     private class AutoNotifier implements RangeNotifier {
 
         @Override
         public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-            for (TrackedBeacon tb : trackedBeacons.getList()) {
+            for (int i = 0; i < trackedBeacons.getSize(); i++) {
+                TrackedBeacon tb = trackedBeacons.getTrackedBeacon(i);
                 Beacon beaconInRange = findTrackedInRange(tb, beacons);
                 Boolean isInRange;
-                isInRange = beaconInRange != null;
+                isInRange = (beaconInRange != null);
                 tb.updateDist(beaconInRange, isInRange);
                 tb.updateState(isInRange);
                 Log.d(TAG, isInRange.toString());
@@ -321,40 +323,9 @@ public class BeaconApplication extends Application implements BeaconConsumer {
                     Log.d(TAG, String.format("Notifying the following ==== %s", tb.toString()));
                 }
                 Log.d(TAG, tb.toString());
+                trackedBeacons.edit(i, tb);
             }
             trackedBeacons.triggerListener();
-        }
-    }
-
-    public class ObservableListWrapper<E> {
-        private List<E> list;
-        private List<IListListener<E>> listeners;
-
-        public ObservableListWrapper() {
-            list = new ArrayList<>();
-            listeners = new ArrayList<>();
-        }
-
-        public List<E> getList() {
-            return list;
-        }
-
-        public void setList(List<E> list) {
-            this.list = list;
-        }
-
-        public void triggerListener() {
-            for (IListListener listener : listeners) {
-                listener.trigger(list);
-            }
-        }
-
-        public void addListeners(IListListener<E> listener) {
-            listeners.add(listener);
-        }
-
-        public void removeListener(IListListener<E> listener) {
-            listeners.remove(listener);
         }
     }
 }

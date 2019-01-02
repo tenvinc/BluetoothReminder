@@ -11,7 +11,6 @@ public class TrackedBeacon {
     private static final long MILLIS_PER_SECOND = 1000;
     private static final int THRESHOLD_COUNT = 5;
     private final String TAG = this.getClass().getName();
-    private long sleepDuration = 10;  // Specify how long beacon notifications will sleep for after a notification in seconds
     private long lastUpdateTime;  // last time when notification was fired in seconds
     private Beacon beacon;
     private String beaconName;
@@ -22,10 +21,18 @@ public class TrackedBeacon {
     public TrackedBeacon(Beacon beacon, String beaconName, long sleepDuration) {
         this.beacon = beacon;
         this.beaconName = beaconName;
-        this.sleepDuration = sleepDuration;
         currState = State.UNKNOWN;
         lastUpdateTime = -1;  //Time is not updated until first notification
         this.currDist = beacon.getDistance();
+    }
+
+    public TrackedBeacon(TrackedBeacon trackedBeacon) {
+        this.lastUpdateTime = trackedBeacon.lastUpdateTime;
+        this.beacon = trackedBeacon.beacon;
+        this.beaconName = trackedBeacon.beaconName;
+        this.currState = trackedBeacon.currState;
+        this.currDist = trackedBeacon.currDist;
+        this.disconnectCount = trackedBeacon.disconnectCount;
     }
 
     public void updateState(Boolean isInRange) {
@@ -112,5 +119,9 @@ public class TrackedBeacon {
 
     public enum State {
         UNKNOWN, IN_RANGE, JUST_OUT_OF_RANGE, STILL_OUT_OF_RANGE
+    }
+
+    public Boolean isSameNameAs(TrackedBeacon other) {
+        return beaconName.equals(other.beaconName);
     }
 }
