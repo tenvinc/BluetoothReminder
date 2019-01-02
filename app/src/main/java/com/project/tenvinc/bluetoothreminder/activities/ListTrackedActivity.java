@@ -1,4 +1,4 @@
-package com.project.tenvinc.bluetoothreminder;
+package com.project.tenvinc.bluetoothreminder.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,12 +10,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.project.tenvinc.bluetoothreminder.BeaconApplication;
+import com.project.tenvinc.bluetoothreminder.R;
+import com.project.tenvinc.bluetoothreminder.TrackedBeacon;
+import com.project.tenvinc.bluetoothreminder.UniqueTrackedBeaconList;
+import com.project.tenvinc.bluetoothreminder.dialogfragments.EditTrackedDialog;
+import com.project.tenvinc.bluetoothreminder.dialogfragments.RemoveTrackedDialog;
+import com.project.tenvinc.bluetoothreminder.exceptions.DuplicateNameException;
 import com.project.tenvinc.bluetoothreminder.interfaces.IListListener;
 
 import java.util.List;
 
-public class ListTrackedActivity extends AppCompatActivity {
+public class ListTrackedActivity extends AppCompatActivity implements RemoveTrackedDialog.RemoveDialogListener,
+        EditTrackedDialog.EditDialogListener {
 
     private static final String TAG = "ListTrackedActivity";
     private ListView trackedList;
@@ -86,5 +95,27 @@ public class ListTrackedActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void remove(String name) {
+        BeaconApplication.getInstance().trackedBeacons.remove(name);
+        BeaconApplication.getInstance().saveTrackedBeacons(BeaconApplication.getInstance().trackedBeacons.getList());
+    }
+
+    @Override
+    public void edit(String oldName, String newName) {
+        try {
+            UniqueTrackedBeaconList trackedBeacons = BeaconApplication.getInstance().trackedBeacons;
+            int index = trackedBeacons.findIndexOf(oldName);
+            TrackedBeacon tb = new TrackedBeacon(trackedBeacons.getTrackedBeacon(index));
+            tb.setBeaconName(newName);
+            trackedBeacons.edit(index, tb);
+            BeaconApplication.getInstance().saveTrackedBeacons(BeaconApplication.getInstance().trackedBeacons.getList());
+            Toast.makeText(this, String.format("\"%s\" changed to \"%s\"", oldName, newName),
+                    Toast.LENGTH_SHORT).show();
+        } catch (DuplicateNameException e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 }

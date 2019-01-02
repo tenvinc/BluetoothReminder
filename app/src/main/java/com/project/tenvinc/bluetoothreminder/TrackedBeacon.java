@@ -17,6 +17,7 @@ public class TrackedBeacon {
     private State currState;
     private Double currDist;
     private int disconnectCount = 0;
+    private boolean isEnabled;
 
     public TrackedBeacon(Beacon beacon, String beaconName, long sleepDuration) {
         this.beacon = beacon;
@@ -24,6 +25,7 @@ public class TrackedBeacon {
         currState = State.UNKNOWN;
         lastUpdateTime = -1;  //Time is not updated until first notification
         this.currDist = beacon.getDistance();
+        isEnabled = true;
     }
 
     public TrackedBeacon(TrackedBeacon trackedBeacon) {
@@ -33,6 +35,7 @@ public class TrackedBeacon {
         this.currState = trackedBeacon.currState;
         this.currDist = trackedBeacon.currDist;
         this.disconnectCount = trackedBeacon.disconnectCount;
+        this.isEnabled = trackedBeacon.isEnabled;
     }
 
     public void updateState(Boolean isInRange) {
@@ -75,6 +78,10 @@ public class TrackedBeacon {
         return false;
     }
 
+    public void toggleIsEnabled(Boolean isEnabled) {
+        this.isEnabled = isEnabled;
+    }
+
     /**
      * Updates the lastUpdateTime with the current time
      */
@@ -102,8 +109,16 @@ public class TrackedBeacon {
         return beaconName;
     }
 
+    public void setBeaconName(String beaconName) {
+        this.beaconName = beaconName;
+    }
+
     public String getDistance() {
         return getDistString(currDist);
+    }
+
+    public Boolean isEnabled() {
+        return isEnabled;
     }
 
     public boolean isSameBeaconAs(Beacon toTest) {

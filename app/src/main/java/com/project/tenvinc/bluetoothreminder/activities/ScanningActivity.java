@@ -1,4 +1,4 @@
-package com.project.tenvinc.bluetoothreminder;
+package com.project.tenvinc.bluetoothreminder.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,7 +12,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.project.tenvinc.bluetoothreminder.BeaconApplication;
+import com.project.tenvinc.bluetoothreminder.R;
+import com.project.tenvinc.bluetoothreminder.TrackedBeacon;
+import com.project.tenvinc.bluetoothreminder.dialogfragments.AddTrackedDialog;
+import com.project.tenvinc.bluetoothreminder.exceptions.DuplicateNameException;
 import com.project.tenvinc.bluetoothreminder.interfaces.IRefresh;
 
 import org.altbeacon.beacon.Beacon;
@@ -77,10 +83,14 @@ public class ScanningActivity extends AppCompatActivity implements AddTrackedDia
     @Override
     public void applyAddition(Beacon beacon, String beaconName) {
         TrackedBeacon newBeacon = new TrackedBeacon(beacon, beaconName, 10);
-        BeaconApplication.getInstance().trackedBeacons.getList().add(newBeacon);
-        BeaconApplication.getInstance().startManualRangingScan(this);
+        try {
+            BeaconApplication.getInstance().trackedBeacons.add(newBeacon);
+            BeaconApplication.getInstance().startManualRangingScan(this);
 
-        BeaconApplication.getInstance().saveTrackedBeacons(BeaconApplication.getInstance().trackedBeacons.getList());
+            BeaconApplication.getInstance().saveTrackedBeacons(BeaconApplication.getInstance().trackedBeacons.getList());
+        } catch (DuplicateNameException e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

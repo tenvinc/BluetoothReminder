@@ -1,4 +1,4 @@
-package com.project.tenvinc.bluetoothreminder;
+package com.project.tenvinc.bluetoothreminder.activities;
 
 import android.Manifest;
 import android.app.Activity;
@@ -16,6 +16,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+
+import com.project.tenvinc.bluetoothreminder.BeaconApplication;
+import com.project.tenvinc.bluetoothreminder.R;
 
 import org.altbeacon.beacon.Beacon;
 

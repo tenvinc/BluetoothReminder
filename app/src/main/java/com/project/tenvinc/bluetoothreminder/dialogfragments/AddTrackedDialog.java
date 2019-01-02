@@ -1,4 +1,4 @@
-package com.project.tenvinc.bluetoothreminder;
+package com.project.tenvinc.bluetoothreminder.dialogfragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -12,6 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.project.tenvinc.bluetoothreminder.BeaconApplication;
+import com.project.tenvinc.bluetoothreminder.R;
 
 import org.altbeacon.beacon.Beacon;
 

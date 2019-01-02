@@ -16,14 +16,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ScanningActivity"
+            android:name=".activities.ScanningActivity"
             android:label="@string/title_activity_scanning"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".ListTrackedActivity"
+            android:name=".activities.ListTrackedActivity"
             android:label="@string/title_activity_tracked"
             android:theme="@style/AppTheme" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,7 +31,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppThemeWithActionbar" />
     </application>

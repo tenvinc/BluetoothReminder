@@ -1,4 +1,4 @@
-package com.project.tenvinc.bluetoothreminder;
+package com.project.tenvinc.bluetoothreminder.activities;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -13,33 +13,41 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.project.tenvinc.bluetoothreminder.BeaconInfo;
+import com.project.tenvinc.bluetoothreminder.R;
+import com.project.tenvinc.bluetoothreminder.dialogfragments.MoreInfoDialog;
+
+import org.altbeacon.beacon.Beacon;
+
 import java.util.List;
 
-class TrackedAdapter extends BaseAdapter {
+import static com.project.tenvinc.bluetoothreminder.BeaconStringUtils.getCombinedIdString;
+import static com.project.tenvinc.bluetoothreminder.BeaconStringUtils.getDistString;
 
+public class BeaconListAdapter extends BaseAdapter {
     private final LayoutInflater inflater;
-    private List<TrackedBeacon> trackedBeacons;
-    private AppCompatActivity context;
+    private List<Beacon> data;
+    private static String TAG = "BeaconListAdapter.class";
+    private final AppCompatActivity context;
 
-    public TrackedAdapter(Context context) {
-        trackedBeacons = new ArrayList<>();
+    public BeaconListAdapter(Context context, List<Beacon> data) {
         inflater = LayoutInflater.from(context);
         this.context = (AppCompatActivity) context;
+        this.data = data;
     }
 
-    public void setData(List<TrackedBeacon> data) {
-        this.trackedBeacons = data;
+    public void setData(List<Beacon> data) {
+        this.data = data;
     }
 
     @Override
     public int getCount() {
-        return trackedBeacons.size();
+        return data.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return trackedBeacons.get(position);
+        return data.get(position);
     }
 
     @Override
@@ -48,24 +56,27 @@ class TrackedAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        convertView = inflater.inflate(R.layout.list_tracked, parent, false);
-        final TrackedBeacon curr = trackedBeacons.get(position);
+    public View getView(final int position, View convertView, final ViewGroup parent) {
+        convertView = inflater.inflate(R.layout.list_scan_result, parent, false);
+        final Beacon currBeacon = data.get(position);
 
         TextView idText = convertView.findViewById(R.id.idText);
-        TextView nameText = convertView.findViewById(R.id.nameText);
         TextView distText = convertView.findViewById(R.id.distText);
-        ImageView options = convertView.findViewById(R.id.options);
-        options.setOnClickListener(new View.OnClickListener() {
+        final ImageView image_options = convertView.findViewById(R.id.options);
+
+        idText.setText(getCombinedIdString(currBeacon));
+        distText.setText(getDistString(currBeacon));
+
+        image_options.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
                 PopupMenu popupMenu = new PopupMenu(v.getContext(), v);
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         MoreInfoDialog dialog = new MoreInfoDialog();
                         Bundle bundle = new Bundle();
-                        bundle.putParcelable("parcel", new BeaconInfo(curr.getBeacon()));
+                        bundle.putParcelable("parcel", new BeaconInfo(currBeacon));
                         dialog.setArguments(bundle);
                         showDialog(dialog);
                         return true;
@@ -75,11 +86,6 @@ class TrackedAdapter extends BaseAdapter {
                 popupMenu.show();
             }
         });
-
-        idText.setText(curr.getUuid());
-        nameText.setText(curr.getBeaconName());
-        distText.setText(curr.getDistance());
-
         return convertView;
     }
 

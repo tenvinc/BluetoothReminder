@@ -1,5 +1,6 @@
 package com.project.tenvinc.bluetoothreminder;
 
+import com.project.tenvinc.bluetoothreminder.exceptions.DuplicateNameException;
 import com.project.tenvinc.bluetoothreminder.interfaces.IListListener;
 
 import org.altbeacon.beacon.Beacon;
@@ -23,13 +24,21 @@ public class UniqueTrackedBeaconList implements BeaconApplication.ObservableList
         listeners = new ArrayList<>();
     }
 
-    public void add(TrackedBeacon trackedBeacon) {
-        if (isInList(trackedBeacon) < 0) {
+    public void add(TrackedBeacon trackedBeacon) throws DuplicateNameException {
+        if (indexOf(trackedBeacon) < 0) {
             trackedBeacons.add(trackedBeacon);
+        } else {
+            throw new DuplicateNameException(
+                    String.format("\"%s\" has already been used", trackedBeacon.getBeaconName()));
         }
     }
 
-    public void edit(int index, TrackedBeacon trackedBeacon) {
+    public void edit(int index, TrackedBeacon trackedBeacon) throws DuplicateNameException {
+        int dx = indexOf(trackedBeacon);
+        if (dx != -1 && dx != index) {
+            throw new DuplicateNameException(
+                    String.format("\"%s\" has already been used", trackedBeacon.getBeaconName()));
+        }
         trackedBeacons.remove(index);
         trackedBeacons.add(index, trackedBeacon);
     }
@@ -57,7 +66,7 @@ public class UniqueTrackedBeaconList implements BeaconApplication.ObservableList
         return -1;
     }
 
-    private int isInList(TrackedBeacon toTest) {
+    private int indexOf(TrackedBeacon toTest) {
         for (int i = 0; i < trackedBeacons.size(); i++) {
             if (trackedBeacons.get(i).isSameNameAs(toTest)) {
                 return i;
@@ -66,7 +75,7 @@ public class UniqueTrackedBeaconList implements BeaconApplication.ObservableList
         return -1;
     }
 
-    public boolean isInList(Beacon toTest) {
+    public boolean indexOf(Beacon toTest) {
         for (int i = 0; i < trackedBeacons.size(); i++) {
             if (trackedBeacons.get(i).isSameBeaconAs(toTest)) {
                 return true;

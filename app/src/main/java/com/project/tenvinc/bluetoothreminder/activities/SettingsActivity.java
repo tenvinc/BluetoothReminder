@@ -1,4 +1,4 @@
-package com.project.tenvinc.bluetoothreminder;
+package com.project.tenvinc.bluetoothreminder.activities;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -17,6 +17,9 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.MenuItem;
+
+import com.project.tenvinc.bluetoothreminder.BeaconApplication;
+import com.project.tenvinc.bluetoothreminder.R;
 
 import java.util.List;
 

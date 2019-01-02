@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
+import com.project.tenvinc.bluetoothreminder.activities.MainActivity;
+
 public class ConstScanNotifHelper extends ContextWrapper {
 
     public static final String CHANNEL_ID = "Enable foreground channel id";

@@ -3,17 +3,17 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="com.project.tenvinc.bluetoothreminder.SettingsActivity$GeneralPreferenceFragment"
+        android:fragment="com.project.tenvinc.bluetoothreminder.activities.SettingsActivity$GeneralPreferenceFragment"
         android:icon="@drawable/ic_settings_black"
         android:title="@string/pref_header_general" />
 
     <header
-        android:fragment="com.project.tenvinc.bluetoothreminder.SettingsActivity$ScanPreferenceFragment"
+        android:fragment="com.project.tenvinc.bluetoothreminder.activities.SettingsActivity$ScanPreferenceFragment"
         android:icon="@drawable/ic_settings_bluetooth_black"
         android:title="@string/pref_header_scan" />
 
     <header
-        android:fragment="com.project.tenvinc.bluetoothreminder.SettingsActivity$NotificationPreferenceFragment"
+        android:fragment="com.project.tenvinc.bluetoothreminder.activities.SettingsActivity$NotificationPreferenceFragment"
         android:icon="@drawable/ic_notifications_black"
         android:title="@string/pref_header_notifications" />
 

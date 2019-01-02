@@ -4,11 +4,13 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.os.RemoteException;
 import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.project.tenvinc.bluetoothreminder.exceptions.DuplicateNameException;
 import com.project.tenvinc.bluetoothreminder.interfaces.IListListener;
 import com.project.tenvinc.bluetoothreminder.interfaces.IRefresh;
 
@@ -25,19 +27,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static android.preference.PreferenceManager.KEY_HAS_SET_DEFAULT_VALUES;
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
-import static com.project.tenvinc.bluetoothreminder.ListTrackedActivity.KEY_TRACKED_BEACONS;
-import static com.project.tenvinc.bluetoothreminder.ListTrackedActivity.TRACKED_BEACON_STORAGE;
-import static com.project.tenvinc.bluetoothreminder.SettingsActivity.GeneralPreferenceFragment.PREF_KEY_SWITCH_BG;
-import static com.project.tenvinc.bluetoothreminder.SettingsActivity.GeneralPreferenceFragment.PREF_KEY_SWITCH_FG;
-import static com.project.tenvinc.bluetoothreminder.SettingsActivity.GeneralPreferenceFragment.PREF_KEY_SWITCH_SCAN;
-import static com.project.tenvinc.bluetoothreminder.SettingsActivity.NotificationPreferenceFragment.PREF_KEY_NOTIF_FREQUENCY;
-import static com.project.tenvinc.bluetoothreminder.SettingsActivity.NotificationPreferenceFragment.PREF_KEY_SWITCH_NOTIF;
-import static com.project.tenvinc.bluetoothreminder.SettingsActivity.NotificationPreferenceFragment.PREF_KEY_SWITCH_VIBRATION;
-import static com.project.tenvinc.bluetoothreminder.SettingsActivity.ScanPreferenceFragment.PREF_KEY_BG_DELAY;
-import static com.project.tenvinc.bluetoothreminder.SettingsActivity.ScanPreferenceFragment.PREF_KEY_BG_PERIOD;
-import static com.project.tenvinc.bluetoothreminder.SettingsActivity.ScanPreferenceFragment.PREF_KEY_FG_DELAY;
-import static com.project.tenvinc.bluetoothreminder.SettingsActivity.ScanPreferenceFragment.PREF_KEY_FG_PERIOD;
+import static com.project.tenvinc.bluetoothreminder.activities.ListTrackedActivity.KEY_TRACKED_BEACONS;
+import static com.project.tenvinc.bluetoothreminder.activities.ListTrackedActivity.TRACKED_BEACON_STORAGE;
+import static com.project.tenvinc.bluetoothreminder.activities.SettingsActivity.GeneralPreferenceFragment.PREF_KEY_SWITCH_BG;
+import static com.project.tenvinc.bluetoothreminder.activities.SettingsActivity.GeneralPreferenceFragment.PREF_KEY_SWITCH_FG;
+import static com.project.tenvinc.bluetoothreminder.activities.SettingsActivity.GeneralPreferenceFragment.PREF_KEY_SWITCH_SCAN;
+import static com.project.tenvinc.bluetoothreminder.activities.SettingsActivity.NotificationPreferenceFragment.PREF_KEY_NOTIF_FREQUENCY;
+import static com.project.tenvinc.bluetoothreminder.activities.SettingsActivity.NotificationPreferenceFragment.PREF_KEY_SWITCH_NOTIF;
+import static com.project.tenvinc.bluetoothreminder.activities.SettingsActivity.NotificationPreferenceFragment.PREF_KEY_SWITCH_VIBRATION;
+import static com.project.tenvinc.bluetoothreminder.activities.SettingsActivity.ScanPreferenceFragment.PREF_KEY_BG_DELAY;
+import static com.project.tenvinc.bluetoothreminder.activities.SettingsActivity.ScanPreferenceFragment.PREF_KEY_BG_PERIOD;
+import static com.project.tenvinc.bluetoothreminder.activities.SettingsActivity.ScanPreferenceFragment.PREF_KEY_FG_DELAY;
+import static com.project.tenvinc.bluetoothreminder.activities.SettingsActivity.ScanPreferenceFragment.PREF_KEY_FG_PERIOD;
 
 public class BeaconApplication extends Application implements BeaconConsumer {
 
@@ -65,10 +68,12 @@ public class BeaconApplication extends Application implements BeaconConsumer {
     @Override
     public void onCreate() {
         super.onCreate();
+        initSharedPreferences();
         instance = this;
         beaconManager = BeaconManager.getInstanceForApplication(this);
         beaconManager.getBeaconParsers().clear();
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(IBEACON_LAYOUT));
+
         simulator = new MyBeaconSimulator();
         BeaconManager.setBeaconSimulator(simulator);
 
@@ -77,13 +82,9 @@ public class BeaconApplication extends Application implements BeaconConsumer {
 
         oorNotifHelper = new BeaconOorNotifHelper(this);
 
-        SharedPreferences sharedPreferences = getDefaultSharedPreferences(this);
         trackedBeacons = new UniqueTrackedBeaconList(loadTrackedBeacons());
 
-        waitDuration = Long.parseLong(sharedPreferences.getString(PREF_KEY_NOTIF_FREQUENCY, "-1"));
-        isNotifOn = sharedPreferences.getBoolean(PREF_KEY_SWITCH_NOTIF, true);
-
-        initBeaconManagerSettings(constBuilder);
+        initSettings(constBuilder);
 
         beaconManager.bind(this);
         backgroundPowerSaver = new BackgroundPowerSaver(this);
@@ -105,8 +106,23 @@ public class BeaconApplication extends Application implements BeaconConsumer {
         }
     }
 
-    public void initBeaconManagerSettings(NotificationCompat.Builder builder) {
+    /**
+     * Only initialises the default shared preferences only if it has not been initialised
+     */
+    private void initSharedPreferences() {
         SharedPreferences sharedPreferences = getDefaultSharedPreferences(this);
+        if (!sharedPreferences.getBoolean(KEY_HAS_SET_DEFAULT_VALUES, false)) {
+            PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
+            PreferenceManager.setDefaultValues(this, R.xml.pref_notification, true);
+            PreferenceManager.setDefaultValues(this, R.xml.pref_scan, true);
+        }
+    }
+
+    public void initSettings(NotificationCompat.Builder builder) {
+        SharedPreferences sharedPreferences = getDefaultSharedPreferences(this);
+
+        waitDuration = Long.parseLong(sharedPreferences.getString(PREF_KEY_NOTIF_FREQUENCY, null));
+        isNotifOn = sharedPreferences.getBoolean(PREF_KEY_SWITCH_NOTIF, true);
 
         waitDuration = Long.parseLong(sharedPreferences.getString(PREF_KEY_NOTIF_FREQUENCY, "-1"));
 
@@ -248,17 +264,6 @@ public class BeaconApplication extends Application implements BeaconConsumer {
         }
     }
 
-    public interface ObservableListWrapper<E> {
-
-        void triggerListener();
-
-        void addListeners(IListListener<E> listener);
-
-        void removeListener(IListListener<E> listener);
-
-        void removeAllListeners();
-    }
-
     public void saveTrackedBeacons(List<TrackedBeacon> trackedBeacons) {
         SharedPreferences sharedPreferences = getSharedPreferences(TRACKED_BEACON_STORAGE, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -278,6 +283,17 @@ public class BeaconApplication extends Application implements BeaconConsumer {
         return (data == null) ? new ArrayList<TrackedBeacon>() : data;
     }
 
+    public interface ObservableListWrapper<E> {
+
+        void triggerListener();
+
+        void addListeners(IListListener<E> listener);
+
+        void removeListener(IListListener<E> listener);
+
+        void removeAllListeners();
+    }
+
     /**
      * This class receives a context when it is first created. It is a variant of RangeNotifier which does only a single
      * scan before implementing a callback to the context. Requires context to implement IRefresh.z
@@ -293,7 +309,7 @@ public class BeaconApplication extends Application implements BeaconConsumer {
         public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
             List<Beacon> untrackedBeaconsFound = new ArrayList<>();
             for (Beacon b : beacons) {
-                if (!trackedBeacons.isInList(b)) {
+                if (!trackedBeacons.indexOf(b)) {
                     untrackedBeaconsFound.add(b);
                 }
             }
@@ -310,6 +326,9 @@ public class BeaconApplication extends Application implements BeaconConsumer {
         public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
             for (int i = 0; i < trackedBeacons.getSize(); i++) {
                 TrackedBeacon tb = trackedBeacons.getTrackedBeacon(i);
+                if (!tb.isEnabled()) {
+                    continue;
+                }
                 Beacon beaconInRange = findTrackedInRange(tb, beacons);
                 Boolean isInRange;
                 isInRange = (beaconInRange != null);
@@ -323,7 +342,11 @@ public class BeaconApplication extends Application implements BeaconConsumer {
                     Log.d(TAG, String.format("Notifying the following ==== %s", tb.toString()));
                 }
                 Log.d(TAG, tb.toString());
-                trackedBeacons.edit(i, tb);
+                try {
+                    trackedBeacons.edit(i, tb);
+                } catch (DuplicateNameException e) {
+                    Log.e(TAG, "This should not happen");
+                }
             }
             trackedBeacons.triggerListener();
         }

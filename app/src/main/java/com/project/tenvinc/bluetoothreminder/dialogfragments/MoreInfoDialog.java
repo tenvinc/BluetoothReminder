@@ -1,4 +1,4 @@
-package com.project.tenvinc.bluetoothreminder;
+package com.project.tenvinc.bluetoothreminder.dialogfragments;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -10,14 +10,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
-import org.altbeacon.beacon.Beacon;
+import com.project.tenvinc.bluetoothreminder.BeaconInfo;
+import com.project.tenvinc.bluetoothreminder.R;
 
 public class MoreInfoDialog extends AppCompatDialogFragment {
     private TextView uuidText;
     private TextView minorText;
     private TextView majorText;
     private TextView distText;
-    private Beacon ref;
 
     @NonNull
     @Override
