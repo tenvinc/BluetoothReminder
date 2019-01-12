@@ -20,10 +20,6 @@ import android.widget.Button;
 import com.project.tenvinc.bluetoothreminder.BeaconApplication;
 import com.project.tenvinc.bluetoothreminder.R;
 
-import org.altbeacon.beacon.Beacon;
-
-import java.util.Arrays;
-
 public class MainActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 123;
@@ -64,8 +60,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Todo: to be removed (For simulation only)
-        removeBtn = findViewById(R.id.remove);
+        //For debugging purposes (For simulation only)
+        /*removeBtn = findViewById(R.id.remove);
         removeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                         .build();
                 BeaconApplication.getInstance().simulator.beacons.add(6, newBeacon);
             }
-        });
+        });*/
 
         validatePermissions(this);
     }

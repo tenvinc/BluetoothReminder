@@ -74,8 +74,9 @@ public class BeaconApplication extends Application implements BeaconConsumer {
         beaconManager.getBeaconParsers().clear();
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(IBEACON_LAYOUT));
 
-        simulator = new MyBeaconSimulator();
-        BeaconManager.setBeaconSimulator(simulator);
+        // For debugging purposes
+        /*simulator = new MyBeaconSimulator();
+        BeaconManager.setBeaconSimulator(simulator);*/
 
         constScanNotifHelper = new ConstScanNotifHelper(this);
         NotificationCompat.Builder constBuilder = constScanNotifHelper.getChannelNotificationBuilder();
