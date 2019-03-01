@@ -64,6 +64,7 @@ The beacon protocol used in this app is iBeacon. There are many beacon protocols
 ## References
 - [AltBeacon library](https://altbeacon.github.io/android-beacon-library/javadoc/reference/packages.html)
 - [AltBeacon Example code](https://github.com/AltBeacon/android-beacon-library-reference/blob/master/app/src/main/java/org/altbeacon/beaconreference/BeaconReferenceApplication.java)
+- [AT commands for AT-09](https://www.tinyosshop.com/datasheet/Tinysine%20Serial%20Bluetooth4%20user%20manual.pdf)
 
 [Back To The Top](#read-me-template)
 
